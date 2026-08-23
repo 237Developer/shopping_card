@@ -3,13 +3,15 @@ import { useOutletContext } from "react-router";
 
 import CartCard from "../composants/cartCard";
 import Button from "../composants/Button";
+import { useCart } from "../context/CartContext";
 
 function findElement(arr, id) {
   return arr.find((elt) => elt.id === id);
 }
 
 export default function CartPage() {
-  const { data, cartArticles, setCartArticles } = useOutletContext();
+  const { data } = useOutletContext();
+  const { cartArticles } = useCart();
   return (
     <div className={styles.container}>
       <div className={styles.total}>
@@ -39,7 +41,6 @@ export default function CartPage() {
                 price={dataElt.price * 200}
                 img={dataElt.image}
                 cartQty={elt.count}
-                setArticle={setCartArticles}
               />
             );
           })

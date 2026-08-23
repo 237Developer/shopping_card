@@ -7,16 +7,17 @@ import Footer from "./composants/footer";
 import Sidebar from "./composants/SideBar";
 import Overlay from "./composants/Overlay";
 import { Outlet } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Loader from "./composants/Loader";
 import ScrollToTop from "./utils/ScrollToTop";
 import useFetchData from "./hooks/useFetchData";
 import styles from "./styles/app.module.css";
+import { useCart } from "./context/CartContext";
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data, loading, error } = useFetchData();
-  const [cartArticles, setCartArticles] = useState([]);
+  const { cartArticles } = useCart();
 
   return (
     <div>
@@ -36,7 +37,7 @@ export default function App() {
             ressources.
           </p>
         ) : (
-          <Outlet context={{ data, cartArticles, setCartArticles }} />
+          <Outlet context={{ data }} />
         )}
         <Footer />
       </div>

@@ -4,6 +4,7 @@ import truncateTitle from "../utils/truncate";
 import { useState } from "react";
 import { memo } from "react";
 import { Link } from "react-router";
+import { CART_ACTIONS, useCart } from "../context/CartContext";
 
 const TOTAL_STARS = 5;
 
@@ -20,23 +21,16 @@ function ShopCard({
   id,
   description,
   rating = { rate: 0, count: 0 },
-  setArticle,
   cartQty = 1,
 }) {
   const [qty, setQty] = useState(cartQty);
+  const { dispatch } = useCart();
   const starStates = getStarStates(rating.rate);
 
   function handleAddToCart() {
-    setArticle((prevArticles) => {
-      const existingArticle = prevArticles.find((article) => article.id === id);
-
-      if (existingArticle) {
-        // The item already exists, so we only update its count.
-        return prevArticles.map((article) =>
-          article.id === id ? { ...article, count: qty } : article,
-        );
-      }
-      return [...prevArticles, { id, count: qty }];
+    dispatch({
+      type: CART_ACTIONS.ADD_ARTICLE,
+      payload: { id, count: qty },
     });
   }
 

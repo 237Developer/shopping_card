@@ -1,6 +1,7 @@
 import styles from "../styles/cartCard.module.css";
 import { Icon } from "@iconify/react";
 import truncateTitle from "../utils/truncate";
+import { CART_ACTIONS, useCart } from "../context/CartContext";
 
 export default function CartCard({
   id,
@@ -8,8 +9,8 @@ export default function CartCard({
   price,
   cartQty,
   img,
-  setArticle,
 }) {
+  const { dispatch } = useCart();
   return (
     <div className={styles.cardContainer}>
       <img src={img} alt="T-shirt Basique" className={styles.image} />
@@ -26,12 +27,9 @@ export default function CartCard({
               className={styles.qtyBtn}
               onClick={() => {
                 if (cartQty >= 1) {
-                  setArticle((prevArticles) => {
-                    return prevArticles.map((article) =>
-                      article.id === id
-                        ? { ...article, count: cartQty - 1 }
-                        : article,
-                    );
+                  dispatch({
+                    type: CART_ACTIONS.DECREASE_QUANTITY,
+                    payload: { id },
                   });
                 }
               }}
@@ -45,12 +43,9 @@ export default function CartCard({
               type="button"
               className={styles.qtyBtn}
               onClick={() => {
-                setArticle((prevArticles) => {
-                  return prevArticles.map((article) =>
-                    article.id === id
-                      ? { ...article, count: cartQty + 1 }
-                      : article,
-                  );
+                dispatch({
+                  type: CART_ACTIONS.INCREASE_QUANTITY,
+                  payload: { id },
                 });
               }}
             >
@@ -61,8 +56,9 @@ export default function CartCard({
             icon="fluent:delete-32-regular"
             className={styles.delButton}
             onClick={() => {
-              setArticle((prevArticles) => {
-                return prevArticles.filter((elt) => elt.id !== id);
+              dispatch({
+                type: CART_ACTIONS.REMOVE_ARTICLE,
+                payload: { id },
               });
             }}
           />

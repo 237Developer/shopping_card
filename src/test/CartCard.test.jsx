@@ -2,12 +2,12 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import CartCard from "../composants/cartCard";
-import { useState } from "react";
 import { test, expect } from "vitest";
+import { CartProvider, useCart } from "../context/CartContext";
 
-function CartCardWithState() {
-  const [articles, setArticles] = useState([{ id: 1, count: 11 }]);
-  const cartQty = articles.find((article) => article.id === 1).count;
+function CartCardContent() {
+  const { cartArticles } = useCart();
+  const cartQty = cartArticles.find((article) => article.id === 1).count;
 
   return (
     <CartCard
@@ -16,9 +16,16 @@ function CartCardWithState() {
       title="Test product"
       price={10}
       description="A product used for testing"
-      setArticle={setArticles}
       cartQty={cartQty}
     />
+  );
+}
+
+function CartCardWithState() {
+  return (
+    <CartProvider initialCartArticles={[{ id: 1, count: 11 }]}>
+      <CartCardContent />
+    </CartProvider>
   );
 }
 

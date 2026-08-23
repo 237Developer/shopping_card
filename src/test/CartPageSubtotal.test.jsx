@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, Outlet, RouterProvider } from "react-router";
 import { expect, test } from "vitest";
 import CartPage from "../pages/CartPage";
+import { CartProvider } from "../context/CartContext";
 
 const product = {
   id: 1,
@@ -13,14 +13,10 @@ const product = {
 };
 
 function CartPageLayout() {
-  const [cartArticles, setCartArticles] = useState([{ id: 1, count: 2 }]);
-
   return (
     <Outlet
       context={{
         data: [product],
-        cartArticles,
-        setCartArticles,
       }}
     />
   );
@@ -38,7 +34,11 @@ function renderCartPage() {
     { initialEntries: ["/"] },
   );
 
-  render(<RouterProvider router={router} />);
+  render(
+    <CartProvider initialCartArticles={[{ id: 1, count: 2 }]}>
+      <RouterProvider router={router} />
+    </CartProvider>,
+  );
 }
 
 test("updates the displayed subtotal when the cart quantity changes", async () => {

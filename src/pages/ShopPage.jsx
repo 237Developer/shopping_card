@@ -7,9 +7,11 @@ import getRandomItems from "../utils/getRandomItems";
 import { useMemo, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import useDebounce from "../hooks/useDebounce";
+import { useCart } from "../context/CartContext";
 
 export default function ShopPage() {
-  const { data, setCartArticles, cartArticles } = useOutletContext();
+  const { data } = useOutletContext();
+  const { cartArticles } = useCart();
   const [category, setCategory] = useState(["all"]);
   const [searchResults, setSearchResults] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,7 +170,6 @@ export default function ShopPage() {
               key={id}
               description={description}
               rating={rating}
-              setArticle={setCartArticles}
               cartQty={findArticleCartQty(id)}
             />
           );
