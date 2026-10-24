@@ -43,6 +43,7 @@ export const products = pgTable("products", {
   isActive: boolean("is_active").notNull().default(true),
   sku: text("sku").notNull().unique(),
   threshold: integer("threshold").notNull().default(10),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull().default("0"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   rating: decimal("rating", {precision: 2, scale:1}).notNull().default("0")

@@ -1,0 +1,37 @@
+import { Suspense } from "react";
+import { ProductsHeader } from "@/components/dashboard/products/ProductsHeader";
+import { StatsGridWrapper } from "@/components/dashboard/products/StatsGridWrapper";
+import { TopProductsSection } from "@/components/dashboard/products/TopProductsSection";
+import { FeaturedProductsSection } from "@/components/dashboard/products/FeaturedProductsSection";
+import { LowStockProductsSection } from "@/components/dashboard/products/LowStockProductsSection";
+
+import { StatsGridSkeleton } from "@/components/ui/skeletons/products/StatsGridSkeleton";
+import { TopProductsSkeleton } from "@/components/ui/skeletons/products/TopProductsSkeleton";
+import { FeaturedProductsSkeleton } from "@/components/ui/skeletons/products/FeaturedProductsSkeleton";
+import { LowStockProductsSkeleton } from "@/components/ui/skeletons/products/LowStockProductsSkeleton";
+
+export default function ProductsPage() {
+  return (
+    <div className="space-y-6">
+      <ProductsHeader />
+      
+      <Suspense fallback={<StatsGridSkeleton />}>
+        <StatsGridWrapper />
+      </Suspense>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Suspense fallback={<TopProductsSkeleton />}>
+          <TopProductsSection />
+        </Suspense>
+
+        <Suspense fallback={<FeaturedProductsSkeleton />}>
+          <FeaturedProductsSection />
+        </Suspense>
+
+        <Suspense fallback={<LowStockProductsSkeleton />}>
+          <LowStockProductsSection />
+        </Suspense>
+      </div>
+    </div>
+  );
+}

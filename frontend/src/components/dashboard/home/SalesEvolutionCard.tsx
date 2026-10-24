@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { getSalesEvolution } from "@/lib/dashboard/data/home";
 import { SalesPoint, SalesPeriod } from "@/lib/dashboard/placeholder-data";
-import { SalesEvolutionSkeleton } from "@/components/ui/skeletons/SalesEvolutionSkeleton";
+import { SalesEvolutionSkeleton } from "@/components/ui/skeletons/home/SalesEvolutionSkeleton";
 
 type Pt = { x: number; y: number };
 
@@ -89,7 +89,10 @@ export function SalesEvolutionCard() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }

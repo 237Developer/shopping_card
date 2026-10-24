@@ -7,11 +7,11 @@ import { TopProductsCard } from "@/components/dashboard/home/TopProductsCard";
 import { LowStockProductsCard } from "@/components/dashboard/home/LowStockProductsCard";
 import { PromotionCard } from "@/components/dashboard/home/PromotionCard";
 import { QuickShortcutsCard } from "@/components/dashboard/home/QuickShortcutsCard";
-import { StatsGridSkeleton } from "@/components/ui/skeletons/StatsGridSkeleton";
-import { SalesEvolutionSkeleton } from "@/components/ui/skeletons/SalesEvolutionSkeleton";
-import { RecentOrdersSkeleton } from "@/components/ui/skeletons/RecentOrdersSkeleton";
-import { TopProductsSkeleton } from "@/components/ui/skeletons/TopProductsSkeleton";
-import { LowStockProductsSkeleton } from "@/components/ui/skeletons/LowStockProductsSkeleton";
+import { StatsGridSkeleton } from "@/components/ui/skeletons/home/StatsGridSkeleton";
+import { SalesEvolutionSkeleton } from "@/components/ui/skeletons/home/SalesEvolutionSkeleton";
+import { RecentOrdersSkeleton } from "@/components/ui/skeletons/home/RecentOrdersSkeleton";
+import { TopProductsSkeleton } from "@/components/ui/skeletons/home/TopProductsSkeleton";
+import { LowStockProductsSkeleton } from "@/components/ui/skeletons/home/LowStockProductsSkeleton";
 
 export default function DashboardPage() {
   return (

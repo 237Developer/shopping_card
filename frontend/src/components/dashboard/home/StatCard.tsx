@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -19,9 +19,9 @@ export function StatCard({
   iconBgColor,
   iconColor,
 }: StatCardProps) {
-  const isPositive = trend > 0;
+  const isPositive = trend >= 0;
   return (
-    <div className="bg-white py-2 px-3 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+    <div className="bg-white py-3 px-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
       <div
         className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBgColor} ${iconColor}`}
       >
@@ -37,7 +37,11 @@ export function StatCard({
             isPositive ? "text-emerald-600" : "text-rose-600"
           }`}
         >
-          <span>{isPositive ? "↑" : "↓"}</span>
+          {isPositive ? (
+            <TrendingUp className="w-3.5 h-3.5" />
+          ) : (
+            <TrendingDown className="w-3.5 h-3.5" />
+          )}
           <span>{trendText}</span>
         </div>
       </div>

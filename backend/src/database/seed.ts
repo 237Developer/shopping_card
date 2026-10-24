@@ -46,6 +46,7 @@ async function seed() {
       sku: "IPH15-001",
       stockQuantity: 25,
       threshold: 5,
+      price: "650000",
     },
     {
       name: "T-shirt oversize",
@@ -54,6 +55,7 @@ async function seed() {
       sku: "TSH-OVR-002",
       stockQuantity: 12,
       threshold: 15,
+      price: "12500",
     },
     {
       name: "Sac à main",
@@ -62,6 +64,7 @@ async function seed() {
       sku: "BAG-WHT-003",
       stockQuantity: 10,
       threshold: 5,
+      price: "25000",
     },
     {
       name: "Chaussures Nike",
@@ -70,6 +73,7 @@ async function seed() {
       sku: "NK-SHOE-004",
       stockQuantity: 14,
       threshold: 5,
+      price: "45000",
     },
     {
       name: "Montre connectée",
@@ -78,6 +82,7 @@ async function seed() {
       sku: "WAT-CON-005",
       stockQuantity: 20,
       threshold: 5,
+      price: "35000",
     },
     {
       name: "Casque Bluetooth",
@@ -86,6 +91,7 @@ async function seed() {
       sku: "HP-BT-101",
       stockQuantity: 3,
       threshold: 5,
+      price: "20000",
     },
   ];
 
@@ -102,9 +108,9 @@ async function seed() {
         sku: p.sku,
         stockQuantity: p.stockQuantity,
         threshold: p.threshold,
-        price: "15000",
+        price: p.price,
         createdAt: new Date("2026-10-10T10:00:00Z"),
-      } as any)
+      })
       .onConflictDoNothing()
       .returning();
 
