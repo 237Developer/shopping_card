@@ -5,6 +5,7 @@ import { getLowStockProductsList } from "@/lib/dashboard/data/product";
 interface LowStockProductItem {
   imageUrl: string | null;
   name: string;
+  amount: string;
   remainingStock: number;
 }
 
@@ -42,7 +43,7 @@ export async function LowStockProductsSection() {
                     {product.name}
                   </h3>
                   <p className="text-[11px] text-rose-500 font-medium">
-                    Restant en stock : {product.remainingStock}
+                    Restant : {product.remainingStock} • <span className="text-slate-600">{product.amount}</span>
                   </p>
                 </div>
               </div>

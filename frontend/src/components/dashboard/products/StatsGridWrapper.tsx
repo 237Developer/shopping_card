@@ -1,4 +1,4 @@
-import { Package, Star, AlertTriangle } from "lucide-react";
+import { Package, Star, Sparkles, AlertTriangle } from "lucide-react";
 import { StatCard } from "@/components/dashboard/home/StatCard";
 import { getProductStatsFull } from "@/lib/dashboard/data/product";
 
@@ -6,7 +6,7 @@ export async function StatsGridWrapper() {
   const stats = await getProductStatsFull();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard
         title="Total Produits"
         value={stats.total.total}
@@ -24,6 +24,15 @@ export async function StatsGridWrapper() {
         icon={Star}
         iconBgColor="bg-amber-50"
         iconColor="text-amber-500"
+      />
+      <StatCard
+        title="Produits Star"
+        value={stats.star.total}
+        trendText={`${stats.star.trend >= 0 ? "+" : ""}${stats.star.trend}% ce mois`}
+        trend={stats.star.trend}
+        icon={Sparkles}
+        iconBgColor="bg-purple-50"
+        iconColor="text-purple-500"
       />
       <StatCard
         title="Stock Faible"

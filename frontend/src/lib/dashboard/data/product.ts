@@ -43,6 +43,7 @@ export async function getProductStatsFull() {
     return {
       total: { total: 0, trend: 0 },
       featured: { total: 0, trend: 0 },
+      star: { total: 0, trend: 0 },
       lowStock: { total: 0, trend: 0 },
     };
   }
@@ -72,6 +73,20 @@ export async function getFeaturedProductsList() {
     return await response.json();
   } catch (error) {
     console.error("Error in getFeaturedProductsList:", error);
+    return [];
+  }
+}
+
+export async function getStarProductsList() {
+  try {
+    const url = `${API_URL}/products/star-list`;
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch star products list: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error in getStarProductsList:", error);
     return [];
   }
 }

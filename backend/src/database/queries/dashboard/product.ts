@@ -91,11 +91,11 @@ export async function getFeaturedProductsStats() {
   const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
   const activeFeaturedCondition = and(
-    sql`${statuses.label} IN ('en vedette', 'star')`,
+    eq(statuses.label, "en vedette"),
     or(isNull(productStatuses.expiresAt), gt(productStatuses.expiresAt, now)),
   );
 
-  // Featured products linked via productStatuses where status label is 'en vedette' or 'star' and not expired
+  // Featured products linked via productStatuses where status label is 'en vedette' and not expired
   const [totalResult] = await db
     .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
     .from(products)
@@ -124,6 +124,63 @@ export async function getFeaturedProductsStats() {
     .where(
       and(
         activeFeaturedCondition,
+        gte(productStatuses.assignedAt, startOfPrevMonth),
+        lt(productStatuses.assignedAt, startOfCurrentMonth),
+      ),
+    );
+
+  const total = Number(totalResult?.count ?? 0);
+  const currentCount = Number(thisMonthResult?.count ?? 0);
+  const prevCount = Number(prevMonthResult?.count ?? 0);
+
+  let trend = 0;
+  if (prevCount === 0) {
+    trend = currentCount > 0 ? 100 : 0;
+  } else {
+    trend = Math.round(((currentCount - prevCount) / prevCount) * 100);
+  }
+
+  return { total, trend };
+}
+
+export async function getStarProductsStats() {
+  const now = new Date();
+  const startOfCurrentMonth = getStartOfMonth(now);
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const activeStarCondition = and(
+    eq(statuses.label, "star"),
+    or(isNull(productStatuses.expiresAt), gt(productStatuses.expiresAt, now)),
+  );
+
+  const [totalResult] = await db
+    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .from(products)
+    .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
+    .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
+    .where(activeStarCondition);
+
+  const [thisMonthResult] = await db
+    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .from(products)
+    .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
+    .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
+    .where(
+      and(
+        activeStarCondition,
+        gte(productStatuses.assignedAt, startOfCurrentMonth),
+        lte(productStatuses.assignedAt, now),
+      ),
+    );
+
+  const [prevMonthResult] = await db
+    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .from(products)
+    .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
+    .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
+    .where(
+      and(
+        activeStarCondition,
         gte(productStatuses.assignedAt, startOfPrevMonth),
         lt(productStatuses.assignedAt, startOfCurrentMonth),
       ),
@@ -201,9 +258,13 @@ export async function getTopSellingProducts(limit = 5) {
       id: products.id,
       name: products.name,
       imageUrl: products.imageUrl,
+      price: products.price,
+      stockQuantity: products.stockQuantity,
+      category: categories.name,
       unitsSold,
     })
     .from(products)
+    .innerJoin(categories, eq(products.categoryId, categories.id))
     .innerJoin(orderItems, eq(products.id, orderItems.productId))
     .innerJoin(orders, eq(orderItems.orderId, orders.id))
     .where(
@@ -213,7 +274,14 @@ export async function getTopSellingProducts(limit = 5) {
         notInArray(orders.status, EXCLUDED_STATUSES),
       ),
     )
-    .groupBy(products.id, products.name, products.imageUrl)
+    .groupBy(
+      products.id,
+      products.name,
+      categories.name,
+      products.imageUrl,
+      products.price,
+      products.stockQuantity,
+    )
     .orderBy(desc(unitsSold))
     .limit(limit);
 
@@ -259,6 +327,9 @@ export async function getTopSellingProducts(limit = 5) {
     return {
       imageUrl: product.imageUrl,
       name: product.name,
+      amount: `${Number(product.price).toLocaleString("fr-FR")} FCFA`,
+      stockQuantity: product.stockQuantity,
+      category: product.category,
       unitsSold: currentUnits,
       growth,
     };
@@ -267,28 +338,77 @@ export async function getTopSellingProducts(limit = 5) {
 
 export async function getFeaturedProductsList() {
   const now = new Date();
+  const unitsSold = sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
+
   const results = await db
     .select({
       imageUrl: products.imageUrl,
       name: products.name,
       id: products.id,
       price: products.price,
+      stockQuantity: products.stockQuantity,
+      category: categories.name,
+      unitsSold,
     })
     .from(products)
+    .innerJoin(categories, eq(products.categoryId, categories.id))
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
+    .leftJoin(orderItems, eq(products.id, orderItems.productId))
+    .leftJoin(orders, and(eq(orderItems.orderId, orders.id), notInArray(orders.status, EXCLUDED_STATUSES)))
     .where(
       and(
-        sql`${statuses.label} IN ('en vedette', 'star')`,
+        eq(statuses.label, "en vedette"),
         or(isNull(productStatuses.expiresAt), gt(productStatuses.expiresAt, now)),
       ),
     )
-    .groupBy(products.id, products.name, products.imageUrl, products.price);
+    .groupBy(products.id, products.name, categories.name, products.imageUrl, products.price, products.stockQuantity);
 
   return results.map((p) => ({
     imageUrl: p.imageUrl,
     name: p.name,
     amount: `${Number(p.price).toLocaleString("fr-FR")} FCFA`,
+    stockQuantity: p.stockQuantity,
+    category: p.category,
+    unitsSold: p.unitsSold,
+  }));
+}
+
+export async function getStarProductsList() {
+  const now = new Date();
+  const unitsSold = sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
+
+  const results = await db
+    .select({
+      imageUrl: products.imageUrl,
+      name: products.name,
+      id: products.id,
+      price: products.price,
+      stockQuantity: products.stockQuantity,
+      category: categories.name,
+      unitsSold,
+    })
+    .from(products)
+    .innerJoin(categories, eq(products.categoryId, categories.id))
+    .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
+    .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
+    .leftJoin(orderItems, eq(products.id, orderItems.productId))
+    .leftJoin(orders, and(eq(orderItems.orderId, orders.id), notInArray(orders.status, EXCLUDED_STATUSES)))
+    .where(
+      and(
+        eq(statuses.label, "star"),
+        or(isNull(productStatuses.expiresAt), gt(productStatuses.expiresAt, now)),
+      ),
+    )
+    .groupBy(products.id, products.name, categories.name, products.imageUrl, products.price, products.stockQuantity);
+
+  return results.map((p) => ({
+    imageUrl: p.imageUrl,
+    name: p.name,
+    amount: `${Number(p.price).toLocaleString("fr-FR")} FCFA`,
+    stockQuantity: p.stockQuantity,
+    category: p.category,
+    unitsSold: p.unitsSold,
   }));
 }
 
@@ -298,6 +418,7 @@ export async function getLowStockProductsList() {
       imageUrl: products.imageUrl,
       name: products.name,
       stockQuantity: products.stockQuantity,
+      price: products.price,
     })
     .from(products)
     .where(lte(products.stockQuantity, products.threshold))
@@ -306,6 +427,7 @@ export async function getLowStockProductsList() {
   return results.map((p) => ({
     imageUrl: p.imageUrl,
     name: p.name,
+    amount: `${Number(p.price).toLocaleString("fr-FR")} FCFA`,
     remainingStock: p.stockQuantity,
   }));
 }

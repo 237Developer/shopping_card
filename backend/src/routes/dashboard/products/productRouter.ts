@@ -4,9 +4,11 @@ import {
   getProductPageStats,
   getTotalProductsWithEvolution,
   getFeaturedProductsStats,
+  getStarProductsStats,
   getLowStockProductsStats,
   getTopSellingProducts,
   getFeaturedProductsList,
+  getStarProductsList,
   getLowStockProductsList,
 } from "../../../database/queries/dashboard/product";
 
@@ -38,8 +40,9 @@ router.get("/stats-full", async (_req: Request, res: Response) => {
   try {
     const total = await getTotalProductsWithEvolution();
     const featured = await getFeaturedProductsStats();
+    const star = await getStarProductsStats();
     const lowStock = await getLowStockProductsStats();
-    res.json({ total, featured, lowStock });
+    res.json({ total, featured, star, lowStock });
   } catch (error) {
     console.error("Error fetching full product stats:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -63,6 +66,16 @@ router.get("/featured-list", async (_req: Request, res: Response) => {
     res.json(featured);
   } catch (error) {
     console.error("Error fetching featured products list:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/star-list", async (_req: Request, res: Response) => {
+  try {
+    const starProducts = await getStarProductsList();
+    res.json(starProducts);
+  } catch (error) {
+    console.error("Error fetching star products list:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
