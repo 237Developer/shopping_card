@@ -53,52 +53,64 @@ export async function TopProductsCard() {
       </div>
 
       {/* List */}
-      <div className="flex-1 flex flex-col justify-between space-y-3">
-        {topProducts.map((product: { id: string; name: string; category?: string; imageUrl?: string | null; unitsSold: number; growth: string }, index: number) => (
-          <div
-            key={product.id}
-            className="flex items-center justify-between py-1.5 hover:bg-slate-50/60 rounded-xl px-2 transition-colors"
-          >
-            <div className="flex items-center space-x-3">
-              {/* Rank */}
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${getRankBadgeStyle(
-                  index
-                )}`}
-              >
-                {index + 1}
+      <div className="flex-1 flex flex-col justify-start space-y-3">
+        {topProducts.map(
+          (
+            product: {
+              id: string;
+              name: string;
+              category?: string;
+              imageUrl?: string | null;
+              unitsSold: number;
+              growth: string;
+            },
+            index: number,
+          ) => (
+            <div
+              key={product.id}
+              className="flex items-center justify-between py-1.5 hover:bg-slate-50/60 rounded-xl px-2 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                {/* Rank */}
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${getRankBadgeStyle(
+                    index,
+                  )}`}
+                >
+                  {index + 1}
+                </div>
+
+                {/* Thumbnail */}
+                <ProductImageThumbnail
+                  imageUrl={product.imageUrl}
+                  alt={product.name}
+                  sizeClassName="w-10 h-10"
+                />
+
+                {/* Name & Category */}
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800">
+                    {product.name}
+                  </h4>
+                  <p className="text-[11px] text-slate-400 font-medium">
+                    {product.category}
+                  </p>
+                </div>
               </div>
 
-              {/* Thumbnail */}
-              <ProductImageThumbnail
-                imageUrl={product.imageUrl}
-                alt={product.name}
-                sizeClassName="w-10 h-10"
-              />
-
-              {/* Name & Category */}
-              <div>
-                <h4 className="text-xs font-bold text-slate-800">
-                  {product.name}
-                </h4>
-                <p className="text-[11px] text-slate-400 font-medium">
-                  {product.category}
-                </p>
+              {/* Stats */}
+              <div className="text-right flex items-center space-x-4">
+                <span className="text-xs font-bold text-slate-700">
+                  {product.unitsSold} ventes
+                </span>
+                <span className="text-xs font-semibold text-emerald-600 flex items-center space-x-0.5">
+                  <TrendingUp className="w-3 h-3 mr-0.5 inline" />
+                  {product.growth}
+                </span>
               </div>
             </div>
-
-            {/* Stats */}
-            <div className="text-right flex items-center space-x-4">
-              <span className="text-xs font-bold text-slate-700">
-                {product.unitsSold} ventes
-              </span>
-              <span className="text-xs font-semibold text-emerald-600 flex items-center space-x-0.5">
-                <TrendingUp className="w-3 h-3 mr-0.5 inline" />
-                {product.growth}
-              </span>
-            </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
     </div>
   );

@@ -5,12 +5,14 @@ import { TopProductsSection } from "@/components/dashboard/products/TopProductsS
 import { FeaturedProductsSection } from "@/components/dashboard/products/FeaturedProductsSection";
 import { StarProductsSection } from "@/components/dashboard/products/StarProductsSection";
 import { LowStockProductsSection } from "@/components/dashboard/products/LowStockProductsSection";
+import { ProductsTableSection } from "@/components/dashboard/products/ProductsTableSection";
 
 import { StatsGridSkeleton } from "@/components/ui/skeletons/products/StatsGridSkeleton";
 import { TopProductsSkeleton } from "@/components/ui/skeletons/products/TopProductsSkeleton";
 import { FeaturedProductsSkeleton } from "@/components/ui/skeletons/products/FeaturedProductsSkeleton";
 import { StarProductsSkeleton } from "@/components/ui/skeletons/products/StarProductsSkeleton";
 import { LowStockProductsSkeleton } from "@/components/ui/skeletons/products/LowStockProductsSkeleton";
+import { ProductsTableSkeleton } from "@/components/ui/skeletons/products/ProductsTableSkeleton";
 
 export default function ProductsPage() {
   return (
@@ -38,6 +40,10 @@ export default function ProductsPage() {
           <LowStockProductsSection />
         </Suspense>
       </div>
+
+      <Suspense fallback={<ProductsTableSkeleton />}>
+        <ProductsTableSection />
+      </Suspense>
     </div>
   );
 }

@@ -8,48 +8,31 @@ import { SalesEvolutionSkeleton } from "@/components/ui/skeletons/home/SalesEvol
 
 type Pt = { x: number; y: number };
 
+// Spline Catmull-Rom : la courbe passe exactement par chaque point
 function buildSmoothPath(pts: Pt[]): string {
   const n = pts.length;
   if (n === 0) return "";
   if (n === 1) return `M ${pts[0].x} ${pts[0].y}`;
 
-  const dx: number[] = [];
-  const m: number[] = [];
-  for (let i = 0; i < n - 1; i++) {
-    dx[i] = pts[i + 1].x - pts[i].x;
-    m[i] = (pts[i + 1].y - pts[i].y) / dx[i];
-  }
-
-  const t: number[] = new Array(n);
-  t[0] = m[0];
-  t[n - 1] = m[n - 2];
-  for (let i = 1; i < n - 1; i++) {
-    t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
-  }
-  for (let i = 0; i < n - 1; i++) {
-    if (m[i] === 0) {
-      t[i] = 0;
-      t[i + 1] = 0;
-    } else {
-      const a = t[i] / m[i];
-      const b = t[i + 1] / m[i];
-      const s = a * a + b * b;
-      if (s > 9) {
-        const tau = 3 / Math.sqrt(s);
-        t[i] = tau * a * m[i];
-        t[i + 1] = tau * b * m[i];
-      }
-    }
-  }
+  // Empêche la courbe de dépasser le cadre du graphique (0–100)
+  const clampY = (y: number) => Math.min(100, Math.max(0, y));
 
   let d = `M ${pts[0].x} ${pts[0].y}`;
+
   for (let i = 0; i < n - 1; i++) {
-    const c1x = pts[i].x + dx[i] / 3;
-    const c1y = pts[i].y + (t[i] * dx[i]) / 3;
-    const c2x = pts[i + 1].x - dx[i] / 3;
-    const c2y = pts[i + 1].y - (t[i + 1] * dx[i]) / 3;
-    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${pts[i + 1].x} ${pts[i + 1].y}`;
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = clampY(p1.y + (p2.y - p0.y) / 6);
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = clampY(p2.y - (p3.y - p1.y) / 6);
+
+    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
   }
+
   return d;
 }
 

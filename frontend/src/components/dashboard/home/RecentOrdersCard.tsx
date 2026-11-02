@@ -5,22 +5,18 @@ export async function RecentOrdersCard() {
   const recentOrders = await getRecentOrders(5);
 
   const getStatusBadgeStyle = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status) {
       case "expédiée":
-      case "expediee":
         return "bg-blue-50 text-blue-600 border border-blue-200/60";
       case "en_préparation":
-      case "en préparation":
-      case "en_preparation":
         return "bg-amber-50 text-amber-700 border border-amber-200/60";
       case "payée":
-      case "payee":
         return "bg-emerald-50 text-emerald-600 border border-emerald-200/60";
       case "livrée":
-      case "livree":
         return "bg-purple-50 text-purple-600 border border-purple-200/60";
+      case "en_attente":
+        return "bg-blue-50 text-blue-700 border border-blue-200/60";
       case "annulée":
-      case "annulee":
         return "bg-rose-50 text-rose-600 border border-rose-200/60";
       default:
         return "bg-slate-100 text-slate-600 border border-slate-200";

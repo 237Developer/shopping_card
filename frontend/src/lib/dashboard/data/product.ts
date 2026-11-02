@@ -104,3 +104,62 @@ export async function getLowStockProductsList() {
     return [];
   }
 }
+
+export async function getPaginatedProducts({
+  page = 1,
+  limit = 8,
+  category,
+  status,
+  search,
+  sortBy,
+}: {
+  page?: number;
+  limit?: number;
+  category?: string;
+  status?: string;
+  search?: string;
+  sortBy?: string;
+}) {
+  try {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (category && category !== "all" && category !== "Toutes les catégories") {
+      params.append("category", category);
+    }
+    if (status && status !== "all" && status !== "Tous les statuts") {
+      params.append("status", status);
+    }
+    if (search && search.trim() !== "") {
+      params.append("search", search);
+    }
+    if (sortBy) {
+      params.append("sortBy", sortBy);
+    }
+
+    const url = `${API_URL}/products/paginated?${params.toString()}`;
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch paginated products: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error in getPaginatedProducts:", error);
+    return { products: [], total: 0, totalPages: 1, currentPage: 1 };
+  }
+}
+
+export async function getCategories() {
+  try {
+    const url = `${API_URL}/products/categories`;
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error in getCategories:", error);
+    return [];
+  }
+}

@@ -77,24 +77,22 @@ export const orders = pgTable("orders", {
   status: text("status").notNull().default("en_attente"),
   orderPhone: text("order_phone").notNull(),
   orderName: text("order_name").notNull(),
+  deliveryLocation: text("delivery_location"),
 });
 
 export const orderItems = pgTable(
   "order_items",
   {
+    id: serial("id").primaryKey(),
     orderId: varchar("order_id", { length: 36 })
       .references(() => orders.id)
       .notNull(),
     
     productId: varchar("product_id", { length: 36 })
-      .references(() => products.id)
-      .notNull(),
+      .references(() => products.id, { onDelete: "set null" }),
     unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
     quantity: integer("quantity").notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.orderId, table.productId] }),
-  }),
 );
 
 export const statuses = pgTable("statuses", {

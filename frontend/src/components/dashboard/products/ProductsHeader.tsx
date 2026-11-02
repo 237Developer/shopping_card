@@ -1,4 +1,5 @@
-import { Plus, Package } from "lucide-react";
+import { Package } from "lucide-react";
+import { AddProductButton } from "./AddProductButton";
 
 export function ProductsHeader() {
   return (
@@ -14,10 +15,7 @@ export function ProductsHeader() {
           </p>
         </div>
       </div>
-      <button className="flex items-center gap-2 px-4 py-2.5 bg-[#0475FE] text-white text-xs font-semibold rounded-xl hover:bg-blue-600 transition-colors shadow-sm">
-        <Plus className="w-4 h-4" />
-        <span>Ajouter un produit</span>
-      </button>
+      <AddProductButton />
     </div>
   );
 }
