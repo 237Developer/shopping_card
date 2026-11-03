@@ -7,6 +7,8 @@ import {
   orderItems,
   statuses,
   productStatuses,
+  promotions,
+  productPromotions,
 } from "./schema";
 
 // ---------- Utilitaires ----------
@@ -55,6 +57,8 @@ async function seed() {
   // 0. Nettoyage des commandes (mock) pour pouvoir relancer le seed sans doublons
   await db.delete(orderItems);
   await db.delete(orders);
+  await db.delete(productPromotions);
+  await db.delete(promotions);
 
   // 1. Categories
   const categoryNames = [
@@ -446,6 +450,67 @@ async function seed() {
       await db
         .insert(productStatuses)
         .values({ productId: prodId, statusId: statId })
+        .onConflictDoNothing();
+    }
+  }
+
+  // 2.6 Promotions & assignations
+  const promotionsData = [
+    {
+      name: "Soldes de Fin d'Année",
+      imageUrl: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&auto=format&fit=crop&q=80",
+      percentage: "15.00",
+      startDate: new Date(now.getFullYear(), now.getMonth(), 1),
+      endDate: new Date(now.getFullYear(), now.getMonth() + 2, 31),
+      isVisible: true,
+      products: ["iPhone 15", "Samsung Galaxy S24", "MacBook Pro 14"],
+    },
+    {
+      name: "Super Promo High-Tech",
+      imageUrl: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80",
+      percentage: "20.00",
+      startDate: new Date(now.getFullYear(), now.getMonth(), 5),
+      endDate: new Date(now.getFullYear(), now.getMonth() + 1, 15),
+      isVisible: true,
+      products: ["Montre connectée", "Casque Bluetooth", "AirPods Pro", "Enceinte Portable"],
+    },
+    {
+      name: "Promo Mode & Accessoires",
+      imageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=80",
+      percentage: "10.00",
+      startDate: new Date(now.getFullYear(), now.getMonth(), 10),
+      endDate: new Date(now.getFullYear(), now.getMonth() + 3, 1),
+      isVisible: true,
+      products: ["T-shirt oversize", "Sac à main", "Chaussures Nike", "Baskets de Ville"],
+    },
+  ];
+
+  for (const promo of promotionsData) {
+    const [insertedPromo] = await db
+      .insert(promotions)
+      .values({
+        name: promo.name,
+        imageUrl: promo.imageUrl,
+        percentage: promo.percentage,
+        startDate: promo.startDate,
+        endDate: promo.endDate,
+        isVisible: promo.isVisible,
+        createdAt: yearStart,
+      })
+      .returning();
+
+    if (!insertedPromo) continue;
+
+    for (const prodName of promo.products) {
+      const prodId = productMap.get(prodName);
+      if (!prodId) continue;
+
+      await db
+        .insert(productPromotions)
+        .values({
+          promotionId: insertedPromo.id,
+          productId: prodId,
+        })
         .onConflictDoNothing();
     }
   }

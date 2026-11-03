@@ -116,3 +116,27 @@ export const productStatuses = pgTable(
     pk: primaryKey({ columns: [table.productId, table.statusId] }),
   }),
 );
+
+export const promotions = pgTable("promotions", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  imageUrl: text("image_url"),
+  percentage: decimal("percentage", { precision: 5, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  isVisible: boolean("is_visible").notNull().default(true),
+});
+
+export const productPromotions = pgTable("product_promotions", {
+  id: serial("id").primaryKey(),
+  promotionId: varchar("promotion_id", { length: 36 })
+    .references(() => promotions.id, { onDelete: "cascade" })
+    .notNull(),
+  productId: varchar("product_id", { length: 36 })
+    .references(() => products.id, { onDelete: "cascade" })
+    .notNull(),
+});
+
