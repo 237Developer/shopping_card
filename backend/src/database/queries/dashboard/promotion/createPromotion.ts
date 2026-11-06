@@ -11,13 +11,19 @@ interface NewPromotionData {
 }
 
 export async function createPromotion(data: NewPromotionData) {
+  const startDate = new Date(data.startDate);
+  startDate.setHours(0, 0, 0, 0);
+
+  const endDate = new Date(data.endDate);
+  endDate.setHours(23, 59, 59, 999);
+
   const [createdPromo] = await db
     .insert(promotions)
     .values({
       name: data.name,
       percentage: data.percentage,
-      startDate: data.startDate,
-      endDate: data.endDate,
+      startDate,
+      endDate,
       imageUrl: data.imageUrl,
       isVisible: true,
     })

@@ -15,14 +15,26 @@ export async function getPromotionStats() {
     return {
       activePromotions: 0,
       expiredPromotions: 0,
+      scheduledPromotions: 0,
       endingSoonPromotions: 0,
     };
   }
 }
 
-export async function getPromotionsList() {
+export async function getPromotionsList(filters?: { status?: string; search?: string; sort?: string }) {
   try {
-    const url = `${API_URL}/promotions/list`;
+    const params = new URLSearchParams();
+    if (filters?.status && filters.status !== "Tous les statuts") {
+      params.append("status", filters.status);
+    }
+    if (filters?.search && filters.search.trim() !== "") {
+      params.append("search", filters.search);
+    }
+    if (filters?.sort) {
+      params.append("sort", filters.sort);
+    }
+
+    const url = `${API_URL}/promotions/list?${params.toString()}`;
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) {
       throw new Error(`Failed to fetch promotions list: ${response.statusText}`);

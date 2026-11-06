@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { X, Tag, Upload, Search, CheckCircle2, AlertCircle } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { getCategories, getProductsList } from "@/lib/dashboard/data/product";
@@ -24,6 +25,7 @@ interface ProductItem {
 }
 
 export function AddPromotionModal({ isOpen, onClose }: AddPromotionModalProps) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [percentage, setPercentage] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -130,10 +132,9 @@ export function AddPromotionModal({ isOpen, onClose }: AddPromotionModalProps) {
       }
 
       const result = await addPromotionAction(data);
-      if (result.success && result.promotion) {
-        window.dispatchEvent(
-          new CustomEvent("promotion-added", { detail: result.promotion })
-        );
+      if (result.success) {
+        window.dispatchEvent(new CustomEvent("promotion-added"));
+        router.refresh();
         setSuccessMessage("La promotion a été ajoutée avec succès !");
         setName("");
         setPercentage("");
@@ -142,6 +143,10 @@ export function AddPromotionModal({ isOpen, onClose }: AddPromotionModalProps) {
         setImageFile(null);
         setImagePreview("");
         setSelectedProductIds([]);
+        router.refresh();
+        setTimeout(() => {
+          onClose();
+        }, 500);
       } else {
         setErrorMessage(result.error || "Erreur lors de l'ajout de la promotion");
       }

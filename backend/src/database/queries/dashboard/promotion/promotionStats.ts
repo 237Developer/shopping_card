@@ -1,34 +1,38 @@
-import { db } from "../../../db";
-import { promotions } from "../../../schema";
-import { lte, gte, and, sql, count } from "drizzle-orm";
+import { getPromotionsList } from "./promotionsList";
 
 export async function getPromotionStats() {
+  const promotionsList = await getPromotionsList();
   const now = new Date();
   const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
 
-  const [activeResult] = await db
-    .select({ count: count() })
-    .from(promotions)
-    .where(and(lte(promotions.startDate, now), gte(promotions.endDate, now)));
+  let activePromotions = 0;
+  let expiredPromotions = 0;
+  let scheduledPromotions = 0;
+  let endingSoonPromotions = 0;
 
-  const [expiredResult] = await db
-    .select({ count: count() })
-    .from(promotions)
-    .where(sql`${promotions.endDate} < ${now}`);
+  for (const promo of promotionsList) {
+    if (promo.status === "active") {
+      activePromotions++;
+    } else if (promo.status === "terminée") {
+      expiredPromotions++;
+    } else if (promo.status === "programmée") {
+      scheduledPromotions++;
+    }
 
-  const [endingSoonResult] = await db
-    .select({ count: count() })
-    .from(promotions)
-    .where(
-      and(
-        gte(promotions.endDate, now),
-        lte(promotions.endDate, threeDaysFromNow),
-      ),
-    );
+    const end = new Date(promo.endDate);
+    if (end.getHours() === 0 && end.getMinutes() === 0 && end.getSeconds() === 0) {
+      end.setHours(23, 59, 59, 999);
+    }
+
+    if (end >= now && end <= threeDaysFromNow) {
+      endingSoonPromotions++;
+    }
+  }
 
   return {
-    activePromotions: activeResult?.count ?? 0,
-    expiredPromotions: expiredResult?.count ?? 0,
-    endingSoonPromotions: endingSoonResult?.count ?? 0,
+    activePromotions,
+    expiredPromotions,
+    scheduledPromotions,
+    endingSoonPromotions,
   };
 }

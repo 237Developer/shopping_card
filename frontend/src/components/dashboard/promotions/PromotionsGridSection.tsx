@@ -49,8 +49,13 @@ export function PromotionsGridSection() {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  useEffect(() => {
-    getPromotionsList()
+  const fetchPromotions = () => {
+    setIsLoading(true);
+    getPromotionsList({
+      status: selectedStatus,
+      search: debouncedSearch,
+      sort: selectedSort,
+    })
       .then((res) => {
         if (Array.isArray(res)) {
           setPromotions(res);
@@ -60,27 +65,27 @@ export function PromotionsGridSection() {
       .catch(() => {
         setIsLoading(false);
       });
-  }, []);
+  };
 
-  // Listen for promotion added event
   useEffect(() => {
-    function handlePromotionAdded(e: Event) {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail) {
-        const newPromo = customEvent.detail;
-        setPromotions((prev) => [newPromo, ...prev]);
-      }
+    fetchPromotions();
+  }, [selectedStatus, debouncedSearch, selectedSort]);
+
+  // Listen for promotion added event and re-fetch from backend
+  useEffect(() => {
+    function handlePromotionAdded() {
+      fetchPromotions();
     }
-    window.addEventListener("promotion-added", handlePromotionAdded as EventListener);
+    window.addEventListener("promotion-added", handlePromotionAdded);
     return () => {
-      window.removeEventListener("promotion-added", handlePromotionAdded as EventListener);
+      window.removeEventListener("promotion-added", handlePromotionAdded);
     };
-  }, []);
+  }, [selectedStatus, debouncedSearch, selectedSort]);
 
   const handleDelete = async (id: string) => {
     const res = await deletePromotionAction(id);
     if (res.success) {
-      setPromotions((prev) => prev.filter((p) => p.id !== id));
+      fetchPromotions();
     } else {
       alert(res.error || "Erreur lors de la suppression");
     }
@@ -89,37 +94,13 @@ export function PromotionsGridSection() {
   const handleToggleVisibility = async (id: string, isVisible: boolean) => {
     const res = await togglePromotionVisibilityAction(id, isVisible);
     if (res.success) {
-      setPromotions((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, isVisible } : p))
-      );
+      fetchPromotions();
     } else {
       alert(res.error || "Erreur lors de la modification de la visibilité");
     }
   };
 
-  // Filter and sort promotions
-  const filteredPromotions = promotions.filter((promo) => {
-    if (selectedStatus === "Promotions actives" && promo.status !== "active") return false;
-    if (selectedStatus === "Programmées" && promo.status !== "programmée") return false;
-    if (selectedStatus === "Terminées" && promo.status !== "terminée") return false;
-
-    if (debouncedSearch.trim() !== "") {
-      const query = debouncedSearch.toLowerCase();
-      if (!promo.name.toLowerCase().includes(query)) return false;
-    }
-
-    return true;
-  }).sort((a, b) => {
-    const timeA = new Date(a.startDate).getTime();
-    const timeB = new Date(b.startDate).getTime();
-
-    if (selectedSort === "Ancien") {
-      return timeA - timeB;
-    }
-    return timeB - timeA;
-  });
-
-  const statuses = ["Tous les statuts", "Promotions actives", "Programmées", "Terminées"];
+  const statuses = ["Tous les statuts", "Promotions actives", "Programmées", "Terminées", "Se termine dans 3 jours"];
   const sortOptions = ["Récent", "Ancien"];
 
   return (
@@ -202,13 +183,13 @@ export function PromotionsGridSection() {
         <div className="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-400 text-xs">
           Chargement des promotions...
         </div>
-      ) : filteredPromotions.length === 0 ? (
+      ) : promotions.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-500 text-xs">
           Aucune promotion trouvée.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPromotions.map((promo) => (
+          {promotions.map((promo) => (
             <PromotionCard
               key={promo.id}
               promotion={promo}

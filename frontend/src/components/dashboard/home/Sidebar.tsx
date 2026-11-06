@@ -7,7 +7,7 @@ import {
   Package,
   ShoppingCart,
   Tags,
-  BarChart3,
+  Users,
   ShoppingBag,
   Crown,
 } from "lucide-react";
@@ -34,9 +34,9 @@ const NAVIGATION_ITEMS = [
     icon: Tags,
   },
   {
-    name: "Statistiques",
-    href: "/dashboard/statistics",
-    icon: BarChart3,
+    name: "Clients",
+    href: "/dashboard/clients",
+    icon: Users,
   },
 ];
 

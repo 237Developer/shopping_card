@@ -18,9 +18,14 @@ export async function getPromotionStatsController(_req: Request, res: Response) 
   }
 }
 
-export async function getPromotionsListController(_req: Request, res: Response) {
+export async function getPromotionsListController(req: Request, res: Response) {
   try {
-    const list = await getPromotionsList();
+    const { status, search, sort } = req.query;
+    const list = await getPromotionsList({
+      status: typeof status === "string" ? status : undefined,
+      search: typeof search === "string" ? search : undefined,
+      sort: typeof sort === "string" ? sort : undefined,
+    });
     res.json(list);
   } catch (error) {
     console.error("Error fetching promotions list:", error);

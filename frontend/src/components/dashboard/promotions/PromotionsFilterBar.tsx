@@ -31,6 +31,7 @@ export function PromotionsFilterBar() {
     "Promotions actives",
     "Programmées",
     "Terminées",
+    "Se termine dans 3 jours",
   ];
   const types = ["Tous les types", "Récent", "Ancien"];
 

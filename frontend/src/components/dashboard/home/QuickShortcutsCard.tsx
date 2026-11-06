@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlusCircle, ShoppingCart, Tag, BarChart3 } from "lucide-react";
+import { PlusCircle, ShoppingCart, Tag, Users } from "lucide-react";
 
 export function QuickShortcutsCard() {
   const shortcuts = [
@@ -25,9 +25,9 @@ export function QuickShortcutsCard() {
       bg: "bg-amber-50/80 border-amber-100",
     },
     {
-      title: "Voir les statistiques",
-      href: "/dashboard/statistics",
-      icon: BarChart3,
+      title: "Voir les clients",
+      href: "/dashboard/clients",
+      icon: Users,
       color: "text-emerald-600",
       bg: "bg-emerald-50/80 border-emerald-100",
     },
