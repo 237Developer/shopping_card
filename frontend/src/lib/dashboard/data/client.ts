@@ -1,10 +1,12 @@
 "use server";
 
+import { fetchWithAuth } from "../fetchWithAuth";
+
 const API_URL = process.env.API_URL ?? "http://localhost:3001/api/dashboard";
 
 export async function getClientStatsFull() {
   try {
-    const response = await fetch(`${API_URL}/clients/stats-full`, {
+    const response = await fetchWithAuth(`${API_URL}/clients/stats-full`, {
       cache: "no-store",
     });
     if (!response.ok) throw new Error("Failed to fetch client full stats");
@@ -37,7 +39,7 @@ export async function getPaginatedClients({
     if (filter) query.set("filter", filter);
     if (search) query.set("search", search);
 
-    const response = await fetch(`${API_URL}/clients/paginated?${query.toString()}`, {
+    const response = await fetchWithAuth(`${API_URL}/clients/paginated?${query.toString()}`, {
       cache: "no-store",
     });
     if (!response.ok) throw new Error("Failed to fetch paginated clients");

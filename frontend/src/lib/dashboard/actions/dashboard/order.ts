@@ -1,13 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { fetchWithAuth } from "../../fetchWithAuth";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3001/api/dashboard";
 
 
 export async function getOrderStatsFull() {
   try {
-    const response = await fetch(`${API_URL}/orders/stats-full`, {
+    const response = await fetchWithAuth(`${API_URL}/orders/stats-full`, {
       cache: "no-store",
     });
     if (!response.ok) throw new Error("Failed to fetch order full stats");
@@ -25,7 +26,7 @@ export async function getOrderStatsFull() {
 
 export async function getOrderSalesEvolution(period: string = "7days") {
   try {
-    const response = await fetch(
+    const response = await fetchWithAuth(
       `${API_URL}/orders/sales-evolution?period=${period}`,
       {
         cache: "no-store",
@@ -58,7 +59,7 @@ export async function getPaginatedOrders(
     if (params.search) query.set("search", params.search);
     if (params.sortBy) query.set("sortBy", params.sortBy);
 
-    const response = await fetch(
+    const response = await fetchWithAuth(
       `${API_URL}/orders/paginated?${query.toString()}`,
       {
         cache: "no-store",
@@ -74,7 +75,7 @@ export async function getPaginatedOrders(
 
 export async function updateOrderStatusAction(orderId: string, status: string) {
   try {
-    const response = await fetch(`${API_URL}/orders/${orderId}/status`, {
+    const response = await fetchWithAuth(`${API_URL}/orders/${orderId}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -96,4 +97,3 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
     return { success: false, error: message };
   }
 }
-

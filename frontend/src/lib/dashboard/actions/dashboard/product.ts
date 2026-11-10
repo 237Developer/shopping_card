@@ -1,12 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { fetchWithAuth } from "../../fetchWithAuth";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3001/api/dashboard";
 
 export async function addProductAction(formData: FormData) {
   try {
-    const response = await fetch(`${API_URL}/products`, {
+    const response = await fetchWithAuth(`${API_URL}/products`, {
       method: "POST",
       body: formData,
       cache: "no-store",
@@ -27,7 +28,7 @@ export async function addProductAction(formData: FormData) {
 
 export async function deleteProductAction(productId: string) {
   try {
-    const response = await fetch(`${API_URL}/products/${productId}`, {
+    const response = await fetchWithAuth(`${API_URL}/products/${productId}`, {
       method: "DELETE",
       cache: "no-store",
     });
@@ -46,7 +47,7 @@ export async function deleteProductAction(productId: string) {
 
 export async function toggleProductVisibilityAction(productId: string, isActive: boolean) {
   try {
-    const response = await fetch(`${API_URL}/products/${productId}/visibility`, {
+    const response = await fetchWithAuth(`${API_URL}/products/${productId}/visibility`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -69,7 +70,7 @@ export async function toggleProductVisibilityAction(productId: string, isActive:
 
 export async function toggleProductStatusAction(productId: string, statusLabel: string, active: boolean) {
   try {
-    const response = await fetch(`${API_URL}/products/${productId}/status`, {
+    const response = await fetchWithAuth(`${API_URL}/products/${productId}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

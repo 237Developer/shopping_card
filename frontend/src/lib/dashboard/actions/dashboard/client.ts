@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { fetchWithAuth } from "../../fetchWithAuth";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3001/api/dashboard";
 
@@ -14,7 +15,7 @@ export async function sendClientMessageAction({
   message: string;
 }) {
   try {
-    const response = await fetch(`${API_URL}/clients/send-message`, {
+    const response = await fetchWithAuth(`${API_URL}/clients/send-message`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

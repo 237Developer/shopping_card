@@ -1,12 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { fetchWithAuth } from "../../fetchWithAuth";
 
 const API_URL = process.env.API_URL ?? "http://localhost:3001/api/dashboard";
 
 export async function addPromotionAction(formData: FormData) {
   try {
-    const response = await fetch(`${API_URL}/promotions`, {
+    const response = await fetchWithAuth(`${API_URL}/promotions`, {
       method: "POST",
       body: formData,
       cache: "no-store",
@@ -27,7 +28,7 @@ export async function addPromotionAction(formData: FormData) {
 
 export async function deletePromotionAction(promotionId: string) {
   try {
-    const response = await fetch(`${API_URL}/promotions/${promotionId}`, {
+    const response = await fetchWithAuth(`${API_URL}/promotions/${promotionId}`, {
       method: "DELETE",
       cache: "no-store",
     });
@@ -46,7 +47,7 @@ export async function deletePromotionAction(promotionId: string) {
 
 export async function togglePromotionVisibilityAction(promotionId: string, isVisible: boolean) {
   try {
-    const response = await fetch(`${API_URL}/promotions/${promotionId}/visibility`, {
+    const response = await fetchWithAuth(`${API_URL}/promotions/${promotionId}/visibility`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

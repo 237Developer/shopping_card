@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { useRouter } from "next/navigation";
+import { loginAction } from "@/lib/login";
+import { useEffect } from "react";
 
 export default function DashboardLoginPage() {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
+  const [state, formAction, isPending] = useActionState(loginAction, null);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push("/dashboard");
-  };
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/dashboard");
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4">
@@ -21,15 +24,20 @@ export default function DashboardLoginPage() {
           <p className="text-slate-300 text-sm mt-2">Connexion au Tableau de Bord Administration</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        {state?.error && (
+          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm text-center">
+            {state.error}
+          </div>
+        )}
+
+        <form action={formAction} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-slate-200 mb-2">
               Nom d&apos;utilisateur
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
               required
               className="w-full px-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
               placeholder="Entrez votre nom"
@@ -42,8 +50,7 @@ export default function DashboardLoginPage() {
             </label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
               required
               className="w-full px-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
               placeholder="••••••••"
@@ -52,9 +59,10 @@ export default function DashboardLoginPage() {
 
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg transition duration-200"
+            disabled={isPending}
+            className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold rounded-xl shadow-lg transition duration-200"
           >
-            Se connecter
+            {isPending ? "Connexion en cours..." : "Se connecter"}
           </button>
         </form>
       </div>

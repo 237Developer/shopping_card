@@ -5,14 +5,17 @@ import orderRouter from "./orders/orderRouter";
 import promotionRouter from "./promotions/promotionRouter";
 import clientRouter from "./clients/clientRouter";
 import authRouter from "./auth/authRouter";
+import { verifyToken } from "../../middlewares/dashboard/auth/verifyToken";
 
 const router = Router();
 
 router.use("/auth", authRouter);
-router.use("/home", homeRouter);
-router.use("/products", productRouter);
-router.use("/orders", orderRouter);
-router.use("/promotions", promotionRouter);
-router.use("/clients", clientRouter);
+
+// Protect all dashboard business routes with verifyToken
+router.use("/home", verifyToken, homeRouter);
+router.use("/products", verifyToken, productRouter);
+router.use("/orders", verifyToken, orderRouter);
+router.use("/promotions", verifyToken, promotionRouter);
+router.use("/clients", verifyToken, clientRouter);
 
 export default router;
