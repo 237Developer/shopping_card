@@ -53,7 +53,7 @@ export function Sidebar() {
           </div>
           <div>
             <h1 className="font-bold text-lg tracking-wide text-white">
-              ShopEasy
+              NyangaMarket
             </h1>
             <p className="text-xs text-[#94A3B8]">Admin Dashboard</p>
           </div>
@@ -93,7 +93,7 @@ export function Sidebar() {
           Gérez votre boutique en toute simplicité.
         </p>
         <p className="text-[10px] text-[#94A3B8]">
-          ShopEasy, plus proche de vos clients.
+          NyangaMarket, plus proche de vos clients.
         </p>
       </div>
     </aside>

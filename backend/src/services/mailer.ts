@@ -29,7 +29,7 @@ export async function sendEmail({
 }: SendEmailOptions): Promise<void> {
   try {
     await transporter.sendMail({
-      from: `"ShopEasy" <${emailUser}>`,
+      from: `"NyangaMarket" <${emailUser}>`,
       to,
       subject,
       html: htmlBody,

@@ -140,3 +140,22 @@ export const productPromotions = pgTable("product_promotions", {
     .notNull(),
 });
 
+export const roles = pgTable("roles", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  permissions: integer("permissions").notNull(),
+});
+
+export const users = pgTable("users", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  roleId: integer("role_id")
+    .references(() => roles.id)
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+

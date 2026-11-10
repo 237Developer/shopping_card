@@ -1,4 +1,5 @@
 import { db } from "./db";
+import bcrypt from "bcrypt";
 import {
   customers,
   categories,
@@ -9,6 +10,8 @@ import {
   productStatuses,
   promotions,
   productPromotions,
+  roles,
+  users,
 } from "./schema";
 
 // ---------- Utilitaires ----------
@@ -54,11 +57,40 @@ async function seed() {
   const msPerDay = 24 * 60 * 60 * 1000;
   const totalDays = Math.ceil((now.getTime() - yearStart.getTime()) / msPerDay);
 
-  // 0. Nettoyage des commandes (mock) pour pouvoir relancer le seed sans doublons
+  // 0. Clean orders and users/roles to allow re-running seed without duplicates
   await db.delete(orderItems);
   await db.delete(orders);
   await db.delete(productPromotions);
   await db.delete(promotions);
+  await db.delete(users);
+  await db.delete(roles);
+
+  // 0.1 Seed Roles & Admin User
+  const [adminRole] = await db
+    .insert(roles)
+    .values({ name: "admin", permissions: 255 })
+    .onConflictDoNothing()
+    .returning();
+
+  const [managerRole] = await db
+    .insert(roles)
+    .values({ name: "manager", permissions: 127 })
+    .onConflictDoNothing()
+    .returning();
+
+  const adminRoleId = adminRole?.id ?? (await db.query.roles.findFirst({ where: (r, { eq }) => eq(r.name, "admin") }))?.id;
+
+  if (adminRoleId) {
+    const hashedPassword = bcrypt.hashSync("nyangamarket", 10);
+    await db
+      .insert(users)
+      .values({
+        name: "NyangaMarket",
+        passwordHash: hashedPassword,
+        roleId: adminRoleId,
+      })
+      .onConflictDoNothing();
+  }
 
   // 1. Categories
   const categoryNames = [

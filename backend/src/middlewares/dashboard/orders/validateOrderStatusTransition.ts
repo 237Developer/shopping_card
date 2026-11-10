@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { db } from "../../database/db";
-import { orders } from "../../database/schema";
+import { db } from "../../../database/db";
+import { orders } from "../../../database/schema";
 import { eq } from "drizzle-orm";
 
 export async function validateOrderStatusTransition(
@@ -70,6 +70,10 @@ export async function validateOrderStatusTransition(
     next();
   } catch (error) {
     console.error("Error in validateOrderStatusTransition middleware:", error);
-    res.status(500).json({ error: "Erreur interne du serveur lors de la validation du statut" });
+    res
+      .status(500)
+      .json({
+        error: "Erreur interne du serveur lors de la validation du statut",
+      });
   }
 }
