@@ -1,7 +1,8 @@
 import { Package } from "lucide-react";
 import { AddProductButton } from "./AddProductButton";
 
-export function ProductsHeader() {
+
+export async function ProductsHeader() {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div className="flex items-center gap-3">
@@ -9,9 +10,12 @@ export function ProductsHeader() {
           <Package className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-slate-800">Gestion des Produits</h1>
+          <h1 className="text-xl font-bold text-slate-800">
+            Gestion des Produits
+          </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Consultez et gérez l'inventaire, les produits vedettes et les stocks faibles.
+            Consultez et gérez l&apos;inventaire, les produits vedettes et les
+            stocks faibles.
           </p>
         </div>
       </div>

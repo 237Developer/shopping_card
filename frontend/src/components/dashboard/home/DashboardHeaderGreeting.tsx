@@ -1,11 +1,13 @@
 import { Calendar } from "lucide-react";
+import { getCurrentUser } from "@/lib/dashboard/auth";
 
-export function DashboardHeaderGreeting() {
+export async function DashboardHeaderGreeting() {
+  const currentUser= await getCurrentUser()
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
       <div>
         <h1 className="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-2">
-          <span>Bonjour John</span>
+          <span>Bonjour {currentUser.name}</span>
           <span className="inline-block animate-bounce">👋</span>
         </h1>
         <p className="text-xs md:text-sm text-slate-500 mt-0.5">

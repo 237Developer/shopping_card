@@ -17,7 +17,9 @@ import { ProductsTableSkeleton } from "@/components/ui/skeletons/products/Produc
 export default function ProductsPage() {
   return (
     <div className="space-y-6">
-      <ProductsHeader />
+      <Suspense fallback={<div className="h-16 animate-pulse bg-slate-100 rounded-xl" />}>
+        <ProductsHeader />
+      </Suspense>
       
       <Suspense fallback={<StatsGridSkeleton />}>
         <StatsGridWrapper />

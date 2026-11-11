@@ -4,6 +4,7 @@ import productRouter from "./products/productRouter";
 import orderRouter from "./orders/orderRouter";
 import promotionRouter from "./promotions/promotionRouter";
 import clientRouter from "./clients/clientRouter";
+import userRouter from "./users/userRouter";
 import authRouter from "./auth/authRouter";
 import { verifyToken } from "../../middlewares/dashboard/auth/verifyToken";
 
@@ -17,5 +18,6 @@ router.use("/products", verifyToken, productRouter);
 router.use("/orders", verifyToken, orderRouter);
 router.use("/promotions", verifyToken, promotionRouter);
 router.use("/clients", verifyToken, clientRouter);
+router.use("/users", verifyToken, userRouter);
 
 export default router;

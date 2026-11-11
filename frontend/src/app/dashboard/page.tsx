@@ -16,7 +16,9 @@ import { LowStockProductsSkeleton } from "@/components/ui/skeletons/home/LowStoc
 export default function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <DashboardHeaderGreeting />
+      <Suspense>
+        <DashboardHeaderGreeting />
+      </Suspense>
       <Suspense fallback={<StatsGridSkeleton />}>
         <StatsGridWrapper />
       </Suspense>

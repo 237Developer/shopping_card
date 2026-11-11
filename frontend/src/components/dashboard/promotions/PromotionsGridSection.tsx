@@ -49,35 +49,57 @@ export function PromotionsGridSection() {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  const fetchPromotions = () => {
-    setIsLoading(true);
+  useEffect(() => {
+    let isMounted = true;
     getPromotionsList({
       status: selectedStatus,
       search: debouncedSearch,
       sort: selectedSort,
     })
       .then((res) => {
-        if (Array.isArray(res)) {
-          setPromotions(res);
+        if (isMounted) {
+          if (Array.isArray(res)) {
+            setPromotions(res);
+          }
+          setIsLoading(false);
         }
-        setIsLoading(false);
       })
       .catch(() => {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       });
-  };
-
-  useEffect(() => {
-    fetchPromotions();
+    return () => {
+      isMounted = false;
+    };
   }, [selectedStatus, debouncedSearch, selectedSort]);
 
   // Listen for promotion added event and re-fetch from backend
   useEffect(() => {
+    let isMounted = true;
     function handlePromotionAdded() {
-      fetchPromotions();
+      getPromotionsList({
+        status: selectedStatus,
+        search: debouncedSearch,
+        sort: selectedSort,
+      })
+        .then((res) => {
+          if (isMounted) {
+            if (Array.isArray(res)) {
+              setPromotions(res);
+            }
+            setIsLoading(false);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        });
     }
     window.addEventListener("promotion-added", handlePromotionAdded);
     return () => {
+      isMounted = false;
       window.removeEventListener("promotion-added", handlePromotionAdded);
     };
   }, [selectedStatus, debouncedSearch, selectedSort]);
@@ -85,7 +107,7 @@ export function PromotionsGridSection() {
   const handleDelete = async (id: string) => {
     const res = await deletePromotionAction(id);
     if (res.success) {
-      fetchPromotions();
+      setPromotions((prev) => prev.filter((promo) => promo.id !== id));
     } else {
       alert(res.error || "Erreur lors de la suppression");
     }
@@ -94,7 +116,9 @@ export function PromotionsGridSection() {
   const handleToggleVisibility = async (id: string, isVisible: boolean) => {
     const res = await togglePromotionVisibilityAction(id, isVisible);
     if (res.success) {
-      fetchPromotions();
+      setPromotions((prev) =>
+        prev.map((promo) => (promo.id === id ? { ...promo, isVisible } : promo))
+      );
     } else {
       alert(res.error || "Erreur lors de la modification de la visibilité");
     }

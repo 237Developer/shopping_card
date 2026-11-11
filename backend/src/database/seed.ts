@@ -1,5 +1,6 @@
 import { db } from "./db";
 import bcrypt from "bcrypt";
+import { sql } from "drizzle-orm";
 import {
   customers,
   categories,
@@ -32,6 +33,7 @@ const randInt = (min: number, max: number) =>
 const pick = <T>(arr: T[]): T => arr[Math.floor(rand() * arr.length)];
 
 async function seed() {
+
   console.log("Seeding database with mock data...");
 
   const now = new Date();
@@ -78,7 +80,35 @@ async function seed() {
     .onConflictDoNothing()
     .returning();
 
-  const adminRoleId = adminRole?.id ?? (await db.query.roles.findFirst({ where: (r, { eq }) => eq(r.name, "admin") }))?.id;
+  const [viewerRole] = await db
+    .insert(roles)
+    .values({ name: "viewer", permissions: 1 })
+    .onConflictDoNothing()
+    .returning();
+
+  const adminRoleId =
+    adminRole?.id ??
+    (
+      await db.query.roles.findFirst({
+        where: (r, { eq }) => eq(r.name, "admin"),
+      })
+    )?.id;
+
+  const managerRoleId =
+    managerRole?.id ??
+    (
+      await db.query.roles.findFirst({
+        where: (r, { eq }) => eq(r.name, "manager"),
+      })
+    )?.id;
+
+  const viewerRoleId =
+    viewerRole?.id ??
+    (
+      await db.query.roles.findFirst({
+        where: (r, { eq }) => eq(r.name, "viewer"),
+      })
+    )?.id;
 
   if (adminRoleId) {
     const hashedPassword = bcrypt.hashSync("nyangamarket", 10);
@@ -88,6 +118,30 @@ async function seed() {
         name: "NyangaMarket",
         passwordHash: hashedPassword,
         roleId: adminRoleId,
+      })
+      .onConflictDoNothing();
+  }
+
+  if (managerRoleId) {
+    const hashedManagerPassword = bcrypt.hashSync("manager", 10);
+    await db
+      .insert(users)
+      .values({
+        name: "manager",
+        passwordHash: hashedManagerPassword,
+        roleId: managerRoleId,
+      })
+      .onConflictDoNothing();
+  }
+
+  if (viewerRoleId) {
+    const hashedViewerPassword = bcrypt.hashSync("viewer", 10);
+    await db
+      .insert(users)
+      .values({
+        name: "viewer",
+        passwordHash: hashedViewerPassword,
+        roleId: viewerRoleId,
       })
       .onConflictDoNothing();
   }
@@ -490,7 +544,8 @@ async function seed() {
   const promotionsData = [
     {
       name: "Soldes de Fin d'Année",
-      imageUrl: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&auto=format&fit=crop&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&auto=format&fit=crop&q=80",
       percentage: "15.00",
       startDate: new Date(now.getFullYear(), now.getMonth(), 1),
       endDate: new Date(now.getFullYear(), now.getMonth() + 2, 31),
@@ -499,25 +554,38 @@ async function seed() {
     },
     {
       name: "Super Promo High-Tech",
-      imageUrl: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80",
       percentage: "20.00",
       startDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000),
       endDate: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000),
       isVisible: true,
-      products: ["Montre connectée", "Casque Bluetooth", "AirPods Pro", "Enceinte Portable"],
+      products: [
+        "Montre connectée",
+        "Casque Bluetooth",
+        "AirPods Pro",
+        "Enceinte Portable",
+      ],
     },
     {
       name: "Promo Mode & Accessoires",
-      imageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=80",
       percentage: "10.00",
       startDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
       endDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
       isVisible: false,
-      products: ["T-shirt oversize", "Sac à main", "Chaussures Nike", "Baskets de Ville"],
+      products: [
+        "T-shirt oversize",
+        "Sac à main",
+        "Chaussures Nike",
+        "Baskets de Ville",
+      ],
     },
     {
       name: "Offre Spéciale Casques Audio",
-      imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80",
       percentage: "25.00",
       startDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
       endDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000),
@@ -526,7 +594,8 @@ async function seed() {
     },
     {
       name: "Promo Été Flash",
-      imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
+      imageUrl:
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
       percentage: "30.00",
       startDate: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000),
       endDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
@@ -739,7 +808,10 @@ async function seed() {
 
   // Statut selon l'ancienneté de la commande
   const pickStatus = (daysAgo: number, customerName: string): string => {
-    if (customerName === "Tachinda Freshnel" || customerName === "DJIOGUE Junior") {
+    if (
+      customerName === "Tachinda Freshnel" ||
+      customerName === "DJIOGUE Junior"
+    ) {
       return "en_attente";
     }
     const r = rand();
