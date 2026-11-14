@@ -13,7 +13,6 @@ export async function getProductsList() {
       stockQuantity: products.stockQuantity,
       threshold: products.threshold,
       isActive: products.isActive,
-      sku: products.sku,
       createdAt: products.createdAt,
     })
     .from(products)

@@ -1,7 +1,7 @@
 import { db } from "../../../db";
 import { products, productStatuses, statuses } from "../../../schema";
 import { eq, lte, gte, lt, and, or, isNull, gt, sql, count } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 
 export async function getProductPageStats() {
   const [totalResult] = await db.select({ count: count() }).from(products);
@@ -35,11 +35,21 @@ export async function getTotalProductsWithEvolution() {
   const [thisMonthResult] = await db
     .select({ count: count() })
     .from(products)
-    .where(and(gte(products.createdAt, startOfCurrentMonth), lte(products.createdAt, now)));
+    .where(
+      and(
+        gte(products.createdAt, startOfCurrentMonth),
+        lte(products.createdAt, now),
+      ),
+    );
   const [prevMonthResult] = await db
     .select({ count: count() })
     .from(products)
-    .where(and(gte(products.createdAt, startOfPrevMonth), lt(products.createdAt, startOfCurrentMonth)));
+    .where(
+      and(
+        gte(products.createdAt, startOfPrevMonth),
+        lt(products.createdAt, startOfCurrentMonth),
+      ),
+    );
 
   const total = Number(totalResult?.count ?? 0);
   const currentCount = Number(thisMonthResult?.count ?? 0);
@@ -66,14 +76,18 @@ export async function getFeaturedProductsStats() {
   );
 
   const [totalResult] = await db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
     .where(activeFeaturedCondition);
 
   const [thisMonthResult] = await db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
@@ -86,7 +100,9 @@ export async function getFeaturedProductsStats() {
     );
 
   const [prevMonthResult] = await db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
@@ -123,14 +139,18 @@ export async function getStarProductsStats() {
   );
 
   const [totalResult] = await db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
     .where(activeStarCondition);
 
   const [thisMonthResult] = await db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
@@ -143,7 +163,9 @@ export async function getStarProductsStats() {
     );
 
   const [prevMonthResult] = await db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))

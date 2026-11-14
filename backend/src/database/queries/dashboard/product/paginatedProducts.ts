@@ -1,7 +1,14 @@
 import { db } from "../../../db";
-import { products, categories, productStatuses, statuses, orderItems, orders } from "../../../schema";
+import {
+  products,
+  categories,
+  productStatuses,
+  statuses,
+  orderItems,
+  orders,
+} from "../../../schema";
 import { eq, desc, asc, lte, and, sql } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 
 export async function getPaginatedProductsList({
   page = 1,
@@ -22,9 +29,18 @@ export async function getPaginatedProductsList({
   const now = new Date();
   const startOfCurrentMonth = getStartOfMonth(now);
 
-  const unitsSold = sql<number>`coalesce(sum(case when ${orders.orderDate} >= ${startOfCurrentMonth} and ${orders.orderDate} <= ${now} and ${orders.status} not in ('en_attente', 'annulée') then ${orderItems.quantity} else 0 end), 0)`.mapWith(Number);
-  const isStar = sql<boolean>`EXISTS (SELECT 1 FROM ${productStatuses} ps JOIN ${statuses} s ON ps.status_id = s.id WHERE ps.product_id = ${products.id} AND s.label = 'star')`.mapWith(Boolean);
-  const isFeatured = sql<boolean>`EXISTS (SELECT 1 FROM ${productStatuses} ps JOIN ${statuses} s ON ps.status_id = s.id WHERE ps.product_id = ${products.id} AND s.label = 'en vedette')`.mapWith(Boolean);
+  const unitsSold =
+    sql<number>`coalesce(sum(case when ${orders.orderDate} >= ${startOfCurrentMonth} and ${orders.orderDate} <= ${now} and ${orders.status} not in ('en_attente', 'annulée') then ${orderItems.quantity} else 0 end), 0)`.mapWith(
+      Number,
+    );
+  const isStar =
+    sql<boolean>`EXISTS (SELECT 1 FROM ${productStatuses} ps JOIN ${statuses} s ON ps.status_id = s.id WHERE ps.product_id = ${products.id} AND s.label = 'star')`.mapWith(
+      Boolean,
+    );
+  const isFeatured =
+    sql<boolean>`EXISTS (SELECT 1 FROM ${productStatuses} ps JOIN ${statuses} s ON ps.status_id = s.id WHERE ps.product_id = ${products.id} AND s.label = 'en vedette')`.mapWith(
+      Boolean,
+    );
 
   const conditions = [];
 
@@ -54,7 +70,9 @@ export async function getPaginatedProductsList({
   const isStatusSpecial = status === "en vedette" || status === "star";
 
   let countBase = db
-    .select({ count: sql<number>`count(distinct ${products.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${products.id})`.mapWith(Number),
+    })
     .from(products)
     .innerJoin(categories, eq(products.categoryId, categories.id))
     .leftJoin(orderItems, eq(products.id, orderItems.productId))
@@ -81,7 +99,7 @@ export async function getPaginatedProductsList({
       stockQuantity: products.stockQuantity,
       threshold: products.threshold,
       isActive: products.isActive,
-      sku: products.sku,
+      purchasePrice: products.purchasePrice,
       price: products.price,
       createdAt: products.createdAt,
       unitsSold,
@@ -119,7 +137,7 @@ export async function getPaginatedProductsList({
       products.stockQuantity,
       products.threshold,
       products.isActive,
-      products.sku,
+      products.purchasePrice,
       products.price,
       products.createdAt,
       isStar,
@@ -132,7 +150,6 @@ export async function getPaginatedProductsList({
   return {
     products: rows.map((p) => ({
       id: p.id,
-      code: p.sku || p.id.slice(0, 8),
       name: p.name,
       description: p.description,
       category: p.category,
@@ -140,6 +157,8 @@ export async function getPaginatedProductsList({
       stockQuantity: p.stockQuantity,
       threshold: p.threshold,
       isActive: p.isActive,
+      purchasePrice: `${Number(p.purchasePrice).toLocaleString("fr-FR")} FCFA`,
+      rawPurchasePrice: Number(p.purchasePrice),
       price: `${Number(p.price).toLocaleString("fr-FR")} FCFA`,
       rawPrice: Number(p.price),
       createdAt: p.createdAt,

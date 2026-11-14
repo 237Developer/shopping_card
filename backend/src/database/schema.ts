@@ -41,12 +41,14 @@ export const products = pgTable("products", {
   imageUrl: text("image_url"),
   stockQuantity: integer("stock_quantity").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
-  sku: text("sku").notNull().unique(),
   threshold: integer("threshold").notNull().default(10),
   price: decimal("price", { precision: 10, scale: 2 }).notNull().default("0"),
+  purchasePrice: decimal("purchase_price", { precision: 10, scale: 2 })
+    .notNull()
+    .default("0"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  rating: decimal("rating", {precision: 2, scale:1}).notNull().default("0")
+  rating: decimal("rating", { precision: 2, scale: 1 }).notNull().default("0"),
 });
 
 export const orders = pgTable("orders", {
@@ -65,7 +67,7 @@ export const orders = pgTable("orders", {
       sql`'SE-' || CASE
         WHEN order_sequence < 10000 THEN lpad(order_sequence::text, 4, '0')
         ELSE order_sequence::text
-      END`
+      END`,
     )
     .notNull()
     .unique(),
@@ -80,20 +82,19 @@ export const orders = pgTable("orders", {
   deliveryLocation: text("delivery_location"),
 });
 
-export const orderItems = pgTable(
-  "order_items",
-  {
-    id: serial("id").primaryKey(),
-    orderId: varchar("order_id", { length: 36 })
-      .references(() => orders.id)
-      .notNull(),
-    
-    productId: varchar("product_id", { length: 36 })
-      .references(() => products.id, { onDelete: "set null" }),
-    unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
-    quantity: integer("quantity").notNull(),
-  },
-);
+export const orderItems = pgTable("order_items", {
+  id: serial("id").primaryKey(),
+  orderId: varchar("order_id", { length: 36 })
+    .references(() => orders.id)
+    .notNull(),
+
+  productId: varchar("product_id", { length: 36 }).references(
+    () => products.id,
+    { onDelete: "set null" },
+  ),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  quantity: integer("quantity").notNull(),
+});
 
 export const statuses = pgTable("statuses", {
   id: serial("id").primaryKey(),
@@ -157,5 +158,3 @@ export const users = pgTable("users", {
     .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-
-

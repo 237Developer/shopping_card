@@ -7,4 +7,5 @@ export {
   getTotalOrders,
   getTotalCustomers,
   getTotalRevenue,
+  getTotalPromotions,
 } from "./stats";

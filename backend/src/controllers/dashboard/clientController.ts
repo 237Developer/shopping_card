@@ -5,7 +5,7 @@ import {
   getActiveClients,
 } from "../../database/queries/dashboard/client/clientStats";
 import { getPaginatedClientsList } from "../../database/queries/dashboard/client/paginatedClients";
-import { sendEmail } from "../../services/mailer";
+import { sendEmail } from "../../services/dashboard/mailer";
 
 export async function getClientStatsFullController(
   _req: Request,

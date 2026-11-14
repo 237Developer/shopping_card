@@ -30,10 +30,10 @@ function mulberry32(seed: number) {
 const rand = mulberry32(2026);
 const randInt = (min: number, max: number) =>
   Math.floor(rand() * (max - min + 1)) + min;
+const randFloat = (min: number, max: number) => min + rand() * (max - min);
 const pick = <T>(arr: T[]): T => arr[Math.floor(rand() * arr.length)];
 
 async function seed() {
-
   console.log("Seeding database with mock data...");
 
   const now = new Date();
@@ -181,7 +181,6 @@ async function seed() {
       category: "Téléphones & Tablettes",
       imageUrl:
         "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&auto=format&fit=crop&q=80",
-      sku: "IPH15-001",
       stockQuantity: 25,
       threshold: 5,
       price: "650000",
@@ -191,7 +190,6 @@ async function seed() {
       category: "Vêtements homme",
       imageUrl:
         "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=300&auto=format&fit=crop&q=80",
-      sku: "TSH-OVR-002",
       stockQuantity: 12,
       threshold: 15,
       price: "12500",
@@ -201,7 +199,6 @@ async function seed() {
       category: "Accessoires femme",
       imageUrl:
         "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&auto=format&fit=crop&q=80",
-      sku: "BAG-WHT-003",
       stockQuantity: 10,
       threshold: 5,
       price: "25000",
@@ -211,7 +208,6 @@ async function seed() {
       category: "Sport & Loisirs",
       imageUrl:
         "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&auto=format&fit=crop&q=80",
-      sku: "NK-SHOE-004",
       stockQuantity: 14,
       threshold: 5,
       price: "45000",
@@ -221,7 +217,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&auto=format&fit=crop&q=80",
-      sku: "WAT-CON-005",
       stockQuantity: 20,
       threshold: 5,
       price: "35000",
@@ -231,7 +226,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=300&auto=format&fit=crop&q=80",
-      sku: "HP-BT-101",
       stockQuantity: 3,
       threshold: 5,
       price: "20000",
@@ -241,7 +235,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&auto=format&fit=crop&q=80",
-      sku: "ECO-BT-006",
       stockQuantity: 8,
       threshold: 5,
       price: "15000",
@@ -251,7 +244,6 @@ async function seed() {
       category: "Vêtements homme",
       imageUrl:
         "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&auto=format&fit=crop&q=80",
-      sku: "CHM-MEN-007",
       stockQuantity: 2,
       threshold: 5,
       price: "18000",
@@ -261,7 +253,6 @@ async function seed() {
       category: "Accessoires femme",
       imageUrl:
         "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&auto=format&fit=crop&q=80",
-      sku: "LUN-WHT-008",
       stockQuantity: 18,
       threshold: 5,
       price: "10000",
@@ -271,7 +262,6 @@ async function seed() {
       category: "Sport & Loisirs",
       imageUrl:
         "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&auto=format&fit=crop&q=80",
-      sku: "SAC-SPT-009",
       stockQuantity: 6,
       threshold: 5,
       price: "22000",
@@ -281,7 +271,6 @@ async function seed() {
       category: "Téléphones & Tablettes",
       imageUrl:
         "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&auto=format&fit=crop&q=80",
-      sku: "TAB-PRD-010",
       stockQuantity: 4,
       threshold: 5,
       price: "150000",
@@ -291,7 +280,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&auto=format&fit=crop&q=80",
-      sku: "CEI-CUI-011",
       stockQuantity: 25,
       threshold: 5,
       price: "8000",
@@ -301,7 +289,6 @@ async function seed() {
       category: "Téléphones & Tablettes",
       imageUrl:
         "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=300&auto=format&fit=crop&q=80",
-      sku: "SAM-S24-012",
       stockQuantity: 15,
       threshold: 4,
       price: "580000",
@@ -311,7 +298,6 @@ async function seed() {
       category: "Téléphones & Tablettes",
       imageUrl:
         "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&auto=format&fit=crop&q=80",
-      sku: "MAC-PRO-013",
       stockQuantity: 7,
       threshold: 3,
       price: "1100000",
@@ -321,7 +307,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=300&auto=format&fit=crop&q=80",
-      sku: "AIR-PRO-014",
       stockQuantity: 30,
       threshold: 10,
       price: "140000",
@@ -331,7 +316,6 @@ async function seed() {
       category: "Vêtements homme",
       imageUrl:
         "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=300&auto=format&fit=crop&q=80",
-      sku: "PAN-CHI-015",
       stockQuantity: 14,
       threshold: 5,
       price: "16000",
@@ -341,7 +325,6 @@ async function seed() {
       category: "Vêtements homme",
       imageUrl:
         "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=300&auto=format&fit=crop&q=80",
-      sku: "PUL-LAI-016",
       stockQuantity: 9,
       threshold: 4,
       price: "24000",
@@ -351,7 +334,6 @@ async function seed() {
       category: "Accessoires femme",
       imageUrl:
         "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=300&auto=format&fit=crop&q=80",
-      sku: "ROB-ETE-017",
       stockQuantity: 11,
       threshold: 5,
       price: "21000",
@@ -361,7 +343,6 @@ async function seed() {
       category: "Accessoires femme",
       imageUrl:
         "https://images.unsplash.com/photo-1546938576-6e6a64f317ee?w=300&auto=format&fit=crop&q=80",
-      sku: "SAC-URB-018",
       stockQuantity: 16,
       threshold: 5,
       price: "19000",
@@ -371,7 +352,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=300&auto=format&fit=crop&q=80",
-      sku: "MON-CLS-019",
       stockQuantity: 13,
       threshold: 4,
       price: "50000",
@@ -381,7 +361,6 @@ async function seed() {
       category: "Sport & Loisirs",
       imageUrl:
         "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300&auto=format&fit=crop&q=80",
-      sku: "BAS-VIL-020",
       stockQuantity: 22,
       threshold: 6,
       price: "32000",
@@ -391,7 +370,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=300&auto=format&fit=crop&q=80",
-      sku: "ENC-PRT-021",
       stockQuantity: 19,
       threshold: 5,
       price: "28000",
@@ -401,7 +379,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300&auto=format&fit=crop&q=80",
-      sku: "CLV-MEC-022",
       stockQuantity: 10,
       threshold: 3,
       price: "40000",
@@ -411,7 +388,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=300&auto=format&fit=crop&q=80",
-      sku: "SOU-GMR-023",
       stockQuantity: 25,
       threshold: 6,
       price: "25000",
@@ -421,7 +397,6 @@ async function seed() {
       category: "Accessoires",
       imageUrl:
         "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&auto=format&fit=crop&q=80",
-      sku: "LMP-LED-024",
       stockQuantity: 17,
       threshold: 5,
       price: "14000",
@@ -431,7 +406,6 @@ async function seed() {
       category: "Sport & Loisirs",
       imageUrl:
         "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=300&auto=format&fit=crop&q=80",
-      sku: "BOU-ISO-025",
       stockQuantity: 30,
       threshold: 8,
       price: "9000",
@@ -441,7 +415,6 @@ async function seed() {
       category: "Sport & Loisirs",
       imageUrl:
         "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=300&auto=format&fit=crop&q=80",
-      sku: "TAP-YOG-026",
       stockQuantity: 12,
       threshold: 4,
       price: "11000",
@@ -451,7 +424,6 @@ async function seed() {
       category: "Sport & Loisirs",
       imageUrl:
         "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&auto=format&fit=crop&q=80",
-      sku: "CAS-SPT-027",
       stockQuantity: 21,
       threshold: 5,
       price: "6000",
@@ -466,16 +438,32 @@ async function seed() {
       categoryMap.get(p.category) ?? categoryMap.get("Accessoires")!;
     productPrice.set(p.name, p.price);
 
+    const purchaseRatioByCategory: Record<string, [number, number]> = {
+      "Téléphones & Tablettes": [0.72, 0.85],
+      "Vêtements homme": [0.42, 0.58],
+      "Accessoires femme": [0.45, 0.62],
+      "Sport & Loisirs": [0.5, 0.68],
+      Accessoires: [0.52, 0.7],
+    };
+    const [minRatio, maxRatio] = purchaseRatioByCategory[p.category] ?? [
+      0.55, 0.7,
+    ];
+    const purchaseRatio = randFloat(minRatio, maxRatio);
+    const purchasePrice = Math.max(
+      500,
+      Math.round(Number(p.price) * purchaseRatio),
+    );
+
     const [inserted] = await db
       .insert(products)
       .values({
         name: p.name,
         categoryId: catId,
         imageUrl: p.imageUrl,
-        sku: p.sku,
         stockQuantity: p.stockQuantity,
         threshold: p.threshold,
         price: p.price,
+        purchasePrice: String(purchasePrice),
         createdAt: yearStart,
       })
       .onConflictDoNothing()
@@ -485,7 +473,7 @@ async function seed() {
       productMap.set(p.name, inserted.id);
     } else {
       const existing = await db.query.products.findFirst({
-        where: (prod, { eq }) => eq(prod.sku, p.sku),
+        where: (prod, { eq }) => eq(prod.name, p.name),
       });
       if (existing) productMap.set(p.name, existing.id);
     }
@@ -771,21 +759,21 @@ async function seed() {
 
   // 4a. 7 derniers jours (aujourd'hui = 0) : 2 à 9 commandes par jour
   for (let daysAgo = 0; daysAgo <= 6; daysAgo++) {
-    const count = randInt(2, 9);
+    const count = randInt(1, 4);
     for (let k = 0; k < count; k++) {
       planned.push({ daysAgo, date: dateDaysAgo(daysAgo) });
     }
   }
 
-  // 4b. Jours 7 à 27 : 1 à 6 commandes par jour (alimente "Ce mois")
+  // 4b. Jours 7 à 27 : 0 à 3 commandes par jour (alimente "Ce mois")
   for (let daysAgo = 7; daysAgo <= 27; daysAgo++) {
-    const count = randInt(1, 6);
+    const count = randInt(0, 3);
     for (let k = 0; k < count; k++) {
       planned.push({ daysAgo, date: dateDaysAgo(daysAgo) });
     }
   }
 
-  // 4c. Jours 28 à ~12 mois : tendance en croissance + pic fin d'année
+  // 4c. Jours 28 à ~12 mois : activité modérée, croissance douce + pic fin d'année
   for (let daysAgo = 28; daysAgo < totalDays; daysAgo++) {
     const d = new Date(
       now.getFullYear(),
@@ -793,9 +781,10 @@ async function seed() {
       now.getDate() - daysAgo,
     );
     const progress = 1 - daysAgo / totalDays; // 0 (ancien) -> 1 (récent)
-    const seasonal = d.getMonth() >= 10 ? 1.4 : 1; // nov-déc : plus de ventes
-    const rate = (0.6 + progress * 1.6) * seasonal;
-    const count = Math.floor(rate + rand());
+    const seasonal = d.getMonth() >= 10 ? 1.25 : 1; // nov-déc : plus de ventes
+    const rate = (0.15 + progress * 0.85) * seasonal;
+    let count = rand() < rate ? 1 : 0;
+    if (rate > 0.95 && rand() < 0.18) count += 1;
     for (let k = 0; k < count; k++) {
       planned.push({ daysAgo, date: dateDaysAgo(daysAgo) });
     }
@@ -816,12 +805,18 @@ async function seed() {
     }
     const r = rand();
     if (daysAgo <= 2) {
-      return r < 0.5 ? "en_préparation" : r < 0.9 ? "expédiée" : "annulée";
+      return r < 0.45
+        ? "en_préparation"
+        : r < 0.8
+          ? "expédiée"
+          : r < 0.95
+            ? "livrée"
+            : "annulée";
     }
     if (daysAgo <= 10) {
       return r < 0.25 ? "expédiée" : r < 0.9 ? "livrée" : "annulée";
     }
-    return r < 0.88 ? "livrée" : "annulée";
+    return r < 0.94 ? "livrée" : "annulée";
   };
 
   let ordersCount = 0;
@@ -846,8 +841,8 @@ async function seed() {
     if (!insertedOrder) continue;
     ordersCount++;
 
-    // 1 à 3 produits différents par commande
-    const itemsCount = randInt(1, 3);
+    // 1 à 2 produits la plupart du temps, 3 plus rarement
+    const itemsCount = rand() < 0.85 ? randInt(1, 2) : 3;
     const chosen = new Set<string>();
     while (chosen.size < itemsCount) chosen.add(pickProduct());
 
@@ -855,13 +850,20 @@ async function seed() {
       const prodId = productMap.get(productName);
       if (!prodId) continue;
 
+      const basePrice = Number(productPrice.get(productName) ?? "0");
+      const unitPrice = Math.max(
+        500,
+        Math.round(basePrice * randFloat(0.92, 1.08)),
+      );
+      const quantity = rand() < 0.7 ? 1 : rand() < 0.95 ? 2 : 3;
+
       await db
         .insert(orderItems)
         .values({
           orderId: insertedOrder.id,
           productId: prodId,
-          unitPrice: productPrice.get(productName)!,
-          quantity: randInt(1, 3),
+          unitPrice: String(unitPrice),
+          quantity,
         })
         .onConflictDoNothing();
     }

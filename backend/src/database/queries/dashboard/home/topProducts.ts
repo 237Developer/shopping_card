@@ -1,7 +1,17 @@
 import { db } from "../../../db";
 import { products, categories, orders, orderItems } from "../../../schema";
-import { eq, desc, gte, lte, lt, and, notInArray, inArray, sql } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import {
+  eq,
+  desc,
+  gte,
+  lte,
+  lt,
+  and,
+  notInArray,
+  inArray,
+  sql,
+} from "drizzle-orm";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 import { EXCLUDED_STATUSES } from "./helpers";
 
 export async function getTopProducts(limit?: number) {

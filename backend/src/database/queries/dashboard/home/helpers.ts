@@ -1,5 +1,5 @@
 import { db } from "../../../db";
-import { orders, orderItems } from "../../../schema";
+import { orders, orderItems, products } from "../../../schema";
 import { eq, lte, gte, and, notInArray, sql } from "drizzle-orm";
 
 export const EXCLUDED_STATUSES = ["en_attente", "annulée"];
@@ -9,14 +9,21 @@ export const revenueSum =
     Number,
   );
 
+export const netProfitSum =
+  sql<number>`coalesce(sum((${orderItems.unitPrice} - coalesce(${products.purchasePrice}, 0)) * ${orderItems.quantity}), 0)`.mapWith(
+    Number,
+  );
+
 export async function getSalesSince(startDate: Date) {
   return await db
     .select({
       orderDate: orders.orderDate,
       amount: revenueSum,
+      profit: netProfitSum,
     })
     .from(orders)
     .innerJoin(orderItems, eq(orders.id, orderItems.orderId))
+    .leftJoin(products, eq(orderItems.productId, products.id))
     .where(
       and(
         gte(orders.orderDate, startDate),
@@ -26,7 +33,10 @@ export async function getSalesSince(startDate: Date) {
     .groupBy(orders.id, orders.orderDate);
 }
 
-export async function getRevenueBetween(start?: Date, end?: Date): Promise<number> {
+export async function getRevenueBetween(
+  start?: Date,
+  end?: Date,
+): Promise<number> {
   const conditions = [notInArray(orders.status, EXCLUDED_STATUSES)];
   if (start) conditions.push(gte(orders.orderDate, start));
   if (end) conditions.push(lte(orders.orderDate, end));

@@ -8,6 +8,7 @@ import {
   getTotalOrders,
   getTotalCustomers,
   getTotalRevenue,
+  getTotalPromotions,
   SalesPeriod,
 } from "../../database/queries/dashboard/home";
 
@@ -91,6 +92,16 @@ export async function getTotalRevenueController(_req: Request, res: Response) {
     res.json(totals);
   } catch (error) {
     console.error("Error fetching total revenue:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function getTotalPromotionsController(_req: Request, res: Response) {
+  try {
+    const totals = await getTotalPromotions();
+    res.json(totals);
+  } catch (error) {
+    console.error("Error fetching total promotions:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 }

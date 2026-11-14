@@ -8,6 +8,7 @@ import {
   getTotalOrdersController,
   getTotalCustomersController,
   getTotalRevenueController,
+  getTotalPromotionsController,
 } from "../../../controllers/dashboard/homeController";
 
 const router = Router();
@@ -20,5 +21,6 @@ router.get("/totals/products", getTotalProductsController);
 router.get("/totals/orders", getTotalOrdersController);
 router.get("/totals/customers", getTotalCustomersController);
 router.get("/totals/revenue", getTotalRevenueController);
+router.get("/totals/promotions", getTotalPromotionsController);
 
 export default router;

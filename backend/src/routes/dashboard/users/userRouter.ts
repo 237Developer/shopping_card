@@ -11,10 +11,30 @@ import { PERMISSIONS } from "../../../constants/permissions";
 
 const router = Router();
 
-router.get("/", checkPermission(PERMISSIONS.MANAGE_USERS), getUsersListController);
-router.post("/", checkPermission(PERMISSIONS.MANAGE_USERS), createUserController);
-router.delete("/:id", checkPermission(PERMISSIONS.MANAGE_USERS), deleteUserController);
-router.get("/roles", checkPermission(PERMISSIONS.MANAGE_USERS), getRolesListController);
-router.patch("/roles/:id/permissions", checkPermission(PERMISSIONS.MANAGE_USERS), updateRolePermissionsController);
+router.get(
+  "/",
+  checkPermission(PERMISSIONS.MANAGE_USERS),
+  getUsersListController,
+);
+router.post(
+  "/",
+  checkPermission(PERMISSIONS.MANAGE_USERS),
+  createUserController,
+);
+router.delete(
+  "/:id",
+  checkPermission(PERMISSIONS.MANAGE_USERS),
+  deleteUserController,
+);
+router.get(
+  "/roles",
+  checkPermission(PERMISSIONS.MANAGE_USERS),
+  getRolesListController,
+);
+router.patch(
+  "/roles/:id/permissions",
+  checkPermission(PERMISSIONS.MANAGE_USERS),
+  updateRolePermissionsController,
+);
 
 export default router;

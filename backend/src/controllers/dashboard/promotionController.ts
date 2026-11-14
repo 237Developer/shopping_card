@@ -6,9 +6,12 @@ import {
   deletePromotion,
   togglePromotionVisibility,
 } from "../../database/queries/dashboard/promotion";
-import { uploadImageToCloudinary } from "../../services/cloudinary";
+import { uploadImageToCloudinary } from "../../services/dashboard/cloudinary";
 
-export async function getPromotionStatsController(_req: Request, res: Response) {
+export async function getPromotionStatsController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const stats = await getPromotionStats();
     res.json(stats);
@@ -46,7 +49,8 @@ export async function createPromotionController(req: Request, res: Response) {
     let parsedProductIds: string[] = [];
     if (productIds) {
       try {
-        parsedProductIds = typeof productIds === "string" ? JSON.parse(productIds) : productIds;
+        parsedProductIds =
+          typeof productIds === "string" ? JSON.parse(productIds) : productIds;
       } catch {
         parsedProductIds = [];
       }
@@ -86,13 +90,18 @@ export async function deletePromotionController(req: Request, res: Response) {
   }
 }
 
-export async function togglePromotionVisibilityController(req: Request, res: Response) {
+export async function togglePromotionVisibilityController(
+  req: Request,
+  res: Response,
+) {
   try {
     const id = req.params.id;
     const promotionId = typeof id === "string" ? id : id[0];
     const { isVisible } = req.body;
     if (!promotionId || typeof isVisible !== "boolean") {
-      return res.status(400).json({ error: "Promotion ID and boolean isVisible are required" });
+      return res
+        .status(400)
+        .json({ error: "Promotion ID and boolean isVisible are required" });
     }
     const updated = await togglePromotionVisibility(promotionId, isVisible);
     if (!updated) {

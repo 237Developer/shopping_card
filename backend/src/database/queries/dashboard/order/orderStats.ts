@@ -1,8 +1,8 @@
 import { db } from "../../../db";
 import { orders } from "../../../schema";
 import { and, gte, lte, lt, count, eq } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
-import { getRevenueBetween } from "./helpers";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
+import { getNetProfitBetween, getRevenueBetween } from "./helpers";
 
 export async function getTotalOrders() {
   const now = new Date();
@@ -158,6 +158,36 @@ export async function getTotalRevenue() {
 
   return {
     total: totalRevenue,
+    trend,
+  };
+}
+
+export async function getNetProfit() {
+  const now = new Date();
+  const startOfCurrentMonth = getStartOfMonth(now);
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const totalProfit = await getNetProfitBetween();
+  const currentMonthProfit = await getNetProfitBetween(
+    startOfCurrentMonth,
+    now,
+  );
+  const prevMonthProfit = await getNetProfitBetween(
+    startOfPrevMonth,
+    startOfCurrentMonth,
+  );
+
+  let trend = 0;
+  if (prevMonthProfit === 0) {
+    trend = currentMonthProfit > 0 ? 100 : 0;
+  } else {
+    trend = Math.round(
+      ((currentMonthProfit - prevMonthProfit) / prevMonthProfit) * 100,
+    );
+  }
+
+  return {
+    total: totalProfit,
     trend,
   };
 }

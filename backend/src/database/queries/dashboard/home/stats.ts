@@ -1,7 +1,13 @@
 import { db } from "../../../db";
-import { products, orders, customers } from "../../../schema";
-import { and, gte, lte, lt, count } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import {
+  products,
+  orders,
+  customers,
+  promotions,
+  productPromotions,
+} from "../../../schema";
+import { and, gte, lte, lt, count, sql, eq } from "drizzle-orm";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 import { getRevenueBetween } from "./helpers";
 
 export async function getTotalProducts() {
@@ -146,4 +152,71 @@ export async function getTotalRevenue() {
     total: totalRevenue,
     trend,
   };
+}
+
+export async function getTotalPromotions() {
+  const now = new Date();
+  const startOfCurrentMonth = getStartOfMonth(now);
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const activePromoCondition = and(
+    lte(promotions.startDate, now),
+    gte(promotions.endDate, now),
+  );
+
+  const [totalResult] = await db
+    .select({
+      count:
+        sql<number>`count(distinct ${productPromotions.productId})`.mapWith(
+          Number,
+        ),
+    })
+    .from(productPromotions)
+    .innerJoin(promotions, eq(productPromotions.promotionId, promotions.id))
+    .where(activePromoCondition);
+
+  const [thisMonthResult] = await db
+    .select({
+      count:
+        sql<number>`count(distinct ${productPromotions.productId})`.mapWith(
+          Number,
+        ),
+    })
+    .from(productPromotions)
+    .innerJoin(promotions, eq(productPromotions.promotionId, promotions.id))
+    .where(
+      and(
+        lte(promotions.startDate, now),
+        gte(promotions.endDate, startOfCurrentMonth),
+      ),
+    );
+
+  const [prevMonthResult] = await db
+    .select({
+      count:
+        sql<number>`count(distinct ${productPromotions.productId})`.mapWith(
+          Number,
+        ),
+    })
+    .from(productPromotions)
+    .innerJoin(promotions, eq(productPromotions.promotionId, promotions.id))
+    .where(
+      and(
+        lte(promotions.startDate, startOfCurrentMonth),
+        gte(promotions.endDate, startOfPrevMonth),
+      ),
+    );
+
+  const total = Number(totalResult?.count ?? 0);
+  const currentCount = Number(thisMonthResult?.count ?? 0);
+  const prevCount = Number(prevMonthResult?.count ?? 0);
+
+  let trend = 0;
+  if (prevCount === 0) {
+    trend = currentCount > 0 ? 100 : 0;
+  } else {
+    trend = Math.round(((currentCount - prevCount) / prevCount) * 100);
+  }
+
+  return { total, trend };
 }

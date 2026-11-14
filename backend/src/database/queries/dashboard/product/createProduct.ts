@@ -9,7 +9,7 @@ export type NewProductData = {
   imageUrl?: string;
   stockQuantity?: number;
   isActive?: boolean;
-  sku: string;
+  purchasePrice: string | number;
   threshold?: number;
   price: string | number;
   rating?: string | number;
@@ -37,7 +37,7 @@ export async function createProduct(productData: NewProductData) {
       imageUrl: productData.imageUrl,
       stockQuantity: Number(productData.stockQuantity ?? 0),
       isActive: productData.isActive ?? true,
-      sku: productData.sku,
+      purchasePrice: String(productData.purchasePrice ?? "0"),
       threshold: Number(productData.threshold ?? 10),
       price: String(productData.price ?? "0"),
       rating: String(productData.rating ?? "0"),
@@ -46,7 +46,6 @@ export async function createProduct(productData: NewProductData) {
 
   return {
     id: createdProduct.id,
-    code: createdProduct.sku,
     name: createdProduct.name,
     description: createdProduct.description,
     category: categoryRecord.name,
@@ -54,6 +53,8 @@ export async function createProduct(productData: NewProductData) {
     stockQuantity: createdProduct.stockQuantity,
     threshold: createdProduct.threshold,
     isActive: createdProduct.isActive,
+    purchasePrice: `${Number(createdProduct.purchasePrice).toLocaleString("fr-FR")} FCFA`,
+    rawPurchasePrice: Number(createdProduct.purchasePrice),
     price: `${Number(createdProduct.price).toLocaleString("fr-FR")} FCFA`,
     rawPrice: Number(createdProduct.price),
     createdAt: createdProduct.createdAt,

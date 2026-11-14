@@ -1,7 +1,28 @@
 import { db } from "../../../db";
-import { products, categories, productStatuses, statuses, orderItems, orders } from "../../../schema";
-import { eq, desc, asc, lte, gte, lt, and, or, isNull, gt, notInArray, inArray, sql } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import {
+  products,
+  categories,
+  productStatuses,
+  statuses,
+  orderItems,
+  orders,
+} from "../../../schema";
+import {
+  eq,
+  desc,
+  asc,
+  lte,
+  gte,
+  lt,
+  and,
+  or,
+  isNull,
+  gt,
+  notInArray,
+  inArray,
+  sql,
+} from "drizzle-orm";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 import { EXCLUDED_STATUSES } from "./helpers";
 
 export async function getTopSellingProducts(limit = 5) {
@@ -9,7 +30,8 @@ export async function getTopSellingProducts(limit = 5) {
   const startOfCurrentMonth = getStartOfMonth(now);
   const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-  const unitsSold = sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
+  const unitsSold =
+    sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
 
   const results = await db
     .select({
@@ -50,7 +72,9 @@ export async function getTopSellingProducts(limit = 5) {
     const prevSales = await db
       .select({
         productId: orderItems.productId,
-        units: sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number),
+        units: sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(
+          Number,
+        ),
       })
       .from(orderItems)
       .innerJoin(orders, eq(orderItems.orderId, orders.id))
@@ -96,7 +120,8 @@ export async function getTopSellingProducts(limit = 5) {
 
 export async function getFeaturedProductsList() {
   const now = new Date();
-  const unitsSold = sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
+  const unitsSold =
+    sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
 
   const results = await db
     .select({
@@ -113,14 +138,30 @@ export async function getFeaturedProductsList() {
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
     .leftJoin(orderItems, eq(products.id, orderItems.productId))
-    .leftJoin(orders, and(eq(orderItems.orderId, orders.id), notInArray(orders.status, EXCLUDED_STATUSES)))
+    .leftJoin(
+      orders,
+      and(
+        eq(orderItems.orderId, orders.id),
+        notInArray(orders.status, EXCLUDED_STATUSES),
+      ),
+    )
     .where(
       and(
         eq(statuses.label, "en vedette"),
-        or(isNull(productStatuses.expiresAt), gt(productStatuses.expiresAt, now)),
+        or(
+          isNull(productStatuses.expiresAt),
+          gt(productStatuses.expiresAt, now),
+        ),
       ),
     )
-    .groupBy(products.id, products.name, categories.name, products.imageUrl, products.price, products.stockQuantity);
+    .groupBy(
+      products.id,
+      products.name,
+      categories.name,
+      products.imageUrl,
+      products.price,
+      products.stockQuantity,
+    );
 
   return results.map((p) => ({
     imageUrl: p.imageUrl,
@@ -134,7 +175,8 @@ export async function getFeaturedProductsList() {
 
 export async function getStarProductsList() {
   const now = new Date();
-  const unitsSold = sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
+  const unitsSold =
+    sql<number>`coalesce(sum(${orderItems.quantity}), 0)`.mapWith(Number);
 
   const results = await db
     .select({
@@ -151,14 +193,30 @@ export async function getStarProductsList() {
     .innerJoin(productStatuses, eq(products.id, productStatuses.productId))
     .innerJoin(statuses, eq(productStatuses.statusId, statuses.id))
     .leftJoin(orderItems, eq(products.id, orderItems.productId))
-    .leftJoin(orders, and(eq(orderItems.orderId, orders.id), notInArray(orders.status, EXCLUDED_STATUSES)))
+    .leftJoin(
+      orders,
+      and(
+        eq(orderItems.orderId, orders.id),
+        notInArray(orders.status, EXCLUDED_STATUSES),
+      ),
+    )
     .where(
       and(
         eq(statuses.label, "star"),
-        or(isNull(productStatuses.expiresAt), gt(productStatuses.expiresAt, now)),
+        or(
+          isNull(productStatuses.expiresAt),
+          gt(productStatuses.expiresAt, now),
+        ),
       ),
     )
-    .groupBy(products.id, products.name, categories.name, products.imageUrl, products.price, products.stockQuantity);
+    .groupBy(
+      products.id,
+      products.name,
+      categories.name,
+      products.imageUrl,
+      products.price,
+      products.stockQuantity,
+    );
 
   return results.map((p) => ({
     imageUrl: p.imageUrl,
@@ -191,6 +249,8 @@ export async function getLowStockProductsList() {
 }
 
 export async function getCategoriesList() {
-  const results = await db.select({ id: categories.id, name: categories.name }).from(categories);
+  const results = await db
+    .select({ id: categories.id, name: categories.name })
+    .from(categories);
   return results;
 }

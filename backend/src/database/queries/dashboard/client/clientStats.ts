@@ -1,7 +1,7 @@
 import { db } from "../../../db";
 import { customers, orders } from "../../../schema";
 import { and, gte, lte, lt, count } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 
 export async function getTotalClients() {
   const now = new Date();

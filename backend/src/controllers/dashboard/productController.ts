@@ -17,7 +17,7 @@ import {
   toggleProductStatus,
   createProduct,
 } from "../../database/queries/dashboard/product";
-import { uploadImageToCloudinary } from "../../services/cloudinary";
+import { uploadImageToCloudinary } from "../../services/dashboard/cloudinary";
 
 export async function getProductsListController(_req: Request, res: Response) {
   try {
@@ -29,7 +29,10 @@ export async function getProductsListController(_req: Request, res: Response) {
   }
 }
 
-export async function getProductPageStatsController(_req: Request, res: Response) {
+export async function getProductPageStatsController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const stats = await getProductPageStats();
     res.json(stats);
@@ -39,7 +42,10 @@ export async function getProductPageStatsController(_req: Request, res: Response
   }
 }
 
-export async function getProductStatsFullController(_req: Request, res: Response) {
+export async function getProductStatsFullController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const total = await getTotalProductsWithEvolution();
     const featured = await getFeaturedProductsStats();
@@ -63,7 +69,10 @@ export async function getTopProductsController(req: Request, res: Response) {
   }
 }
 
-export async function getFeaturedProductsListController(_req: Request, res: Response) {
+export async function getFeaturedProductsListController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const featured = await getFeaturedProductsList();
     res.json(featured);
@@ -73,7 +82,10 @@ export async function getFeaturedProductsListController(_req: Request, res: Resp
   }
 }
 
-export async function getStarProductsListController(_req: Request, res: Response) {
+export async function getStarProductsListController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const starProducts = await getStarProductsList();
     res.json(starProducts);
@@ -83,7 +95,10 @@ export async function getStarProductsListController(_req: Request, res: Response
   }
 }
 
-export async function getLowStockProductsListController(_req: Request, res: Response) {
+export async function getLowStockProductsListController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const lowStock = await getLowStockProductsList();
     res.json(lowStock);
@@ -93,7 +108,10 @@ export async function getLowStockProductsListController(_req: Request, res: Resp
   }
 }
 
-export async function getPaginatedProductsController(req: Request, res: Response) {
+export async function getPaginatedProductsController(
+  req: Request,
+  res: Response,
+) {
   try {
     const page = req.query.page ? Number(req.query.page) : 1;
     const limit = req.query.limit ? Number(req.query.limit) : 8;
@@ -102,7 +120,14 @@ export async function getPaginatedProductsController(req: Request, res: Response
     const search = req.query.search as string | undefined;
     const sortBy = req.query.sortBy as string | undefined;
 
-    const result = await getPaginatedProductsList({ page, limit, category, status, search, sortBy });
+    const result = await getPaginatedProductsList({
+      page,
+      limit,
+      category,
+      status,
+      search,
+      sortBy,
+    });
     res.json(result);
   } catch (error) {
     console.error("Error fetching paginated products:", error);
@@ -110,7 +135,10 @@ export async function getPaginatedProductsController(req: Request, res: Response
   }
 }
 
-export async function getCategoriesListController(_req: Request, res: Response) {
+export async function getCategoriesListController(
+  _req: Request,
+  res: Response,
+) {
   try {
     const categoriesList = await getCategoriesList();
     res.json(categoriesList);
@@ -138,13 +166,18 @@ export async function deleteProductController(req: Request, res: Response) {
   }
 }
 
-export async function toggleProductVisibilityController(req: Request, res: Response) {
+export async function toggleProductVisibilityController(
+  req: Request,
+  res: Response,
+) {
   try {
     const id = req.params.id;
     const productId = typeof id === "string" ? id : id[0];
     const { isActive } = req.body;
     if (!productId || typeof isActive !== "boolean") {
-      return res.status(400).json({ error: "Product ID and boolean isActive are required" });
+      return res
+        .status(400)
+        .json({ error: "Product ID and boolean isActive are required" });
     }
     const updated = await toggleProductVisibility(productId, isActive);
     if (!updated) {
@@ -157,13 +190,20 @@ export async function toggleProductVisibilityController(req: Request, res: Respo
   }
 }
 
-export async function toggleProductStatusController(req: Request, res: Response) {
+export async function toggleProductStatusController(
+  req: Request,
+  res: Response,
+) {
   try {
     const id = req.params.id;
     const productId = typeof id === "string" ? id : id[0];
     const { statusLabel, active } = req.body;
     if (!productId || !statusLabel || typeof active !== "boolean") {
-      return res.status(400).json({ error: "Product ID, statusLabel, and boolean active are required" });
+      return res
+        .status(400)
+        .json({
+          error: "Product ID, statusLabel, and boolean active are required",
+        });
     }
     await toggleProductStatus(productId, statusLabel, active);
     res.json({ success: true });
@@ -175,7 +215,16 @@ export async function toggleProductStatusController(req: Request, res: Response)
 
 export async function addProductController(req: Request, res: Response) {
   try {
-    const { name, description, category, price, stockQuantity, threshold, sku, rating } = req.body;
+    const {
+      name,
+      description,
+      category,
+      price,
+      purchasePrice,
+      stockQuantity,
+      threshold,
+      rating,
+    } = req.body;
     const file = (req as Request & { file?: { buffer: Buffer } }).file;
     let imageUrl: string | undefined = undefined;
 
@@ -189,7 +238,7 @@ export async function addProductController(req: Request, res: Response) {
       category: category || "Smartphones",
       imageUrl,
       stockQuantity: stockQuantity ? Number(stockQuantity) : 0,
-      sku,
+      purchasePrice,
       threshold: threshold ? Number(threshold) : 10,
       price,
       rating: rating || "5.0",

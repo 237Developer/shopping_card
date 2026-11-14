@@ -4,14 +4,15 @@ import {
   getPreparingOrders,
   getShippedOrders,
   getTotalRevenue,
+  getNetProfit,
   getOrderSalesEvolution,
   getPaginatedOrdersList,
   updateOrderStatus,
 } from "../../database/queries/dashboard/order";
 import { SalesPeriod } from "../../database/queries/dashboard/order/salesEvolution";
 import { OrderStatus } from "../../database/queries/dashboard/order/changeStatus";
-import { sendOrderStatusEmail } from "../../services/email";
-import { OrderStatus as EmailOrderStatus } from "../../services/orderMessages";
+import { sendOrderStatusEmail } from "../../services/dashboard/email";
+import { OrderStatus as EmailOrderStatus } from "../../services/dashboard/orderMessages";
 
 function mapStatusToEmailStatus(status: string): EmailOrderStatus {
   switch (status) {
@@ -39,11 +40,13 @@ export async function getOrderStatsFullController(
     const preparingOrders = await getPreparingOrders();
     const shippedOrders = await getShippedOrders();
     const revenue = await getTotalRevenue();
+    const netProfit = await getNetProfit();
     res.json({
       totalOrders,
       preparingOrders,
       shippedOrders,
       revenue,
+      netProfit,
     });
   } catch (error) {
     console.error("Error fetching order full stats:", error);

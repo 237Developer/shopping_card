@@ -1,7 +1,7 @@
 import { db } from "../../../db";
 import { customers, orders, orderItems } from "../../../schema";
 import { eq, desc, asc, and, sql, gte, lt, count, max, sum } from "drizzle-orm";
-import { getStartOfMonth } from "../../../../utils/date.js";
+import { getStartOfMonth } from "../../../../utils/dashboard/date.js";
 
 export async function getPaginatedClientsList({
   page = 1,
@@ -19,8 +19,13 @@ export async function getPaginatedClientsList({
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const startOfCurrentMonth = getStartOfMonth(now);
 
-  const customerTotalRevenue = sql<number>`coalesce(sum(${orderItems.unitPrice} * ${orderItems.quantity}), 0)`.mapWith(Number);
-  const totalOrdersCount = sql<number>`count(distinct ${orders.id})`.mapWith(Number);
+  const customerTotalRevenue =
+    sql<number>`coalesce(sum(${orderItems.unitPrice} * ${orderItems.quantity}), 0)`.mapWith(
+      Number,
+    );
+  const totalOrdersCount = sql<number>`count(distinct ${orders.id})`.mapWith(
+    Number,
+  );
   const lastOrderDateExpr = max(orders.orderDate);
   const phoneExpr = max(orders.orderPhone);
 
@@ -34,7 +39,10 @@ export async function getPaginatedClientsList({
 
   if (filter) {
     const normalizedFilter = filter.toLowerCase();
-    if (normalizedFilter.includes("actifs") && !normalizedFilter.includes("in")) {
+    if (
+      normalizedFilter.includes("actifs") &&
+      !normalizedFilter.includes("in")
+    ) {
       // Active clients: placed an order in the last 30 days
       const activeCustomerIdsSubquery = db
         .select({ customerId: orders.customerId })
@@ -42,7 +50,9 @@ export async function getPaginatedClientsList({
         .where(gte(orders.orderDate, thirtyDaysAgo))
         .groupBy(orders.customerId);
 
-      conditions.push(sql`${customers.id} IN (SELECT customer_id FROM (${activeCustomerIdsSubquery}) as active_cust)`);
+      conditions.push(
+        sql`${customers.id} IN (SELECT customer_id FROM (${activeCustomerIdsSubquery}) as active_cust)`,
+      );
     } else if (normalizedFilter.includes("inactifs")) {
       // Inactive clients: NOT placed an order in the last 30 days
       const activeCustomerIdsSubquery = db
@@ -51,7 +61,9 @@ export async function getPaginatedClientsList({
         .where(gte(orders.orderDate, thirtyDaysAgo))
         .groupBy(orders.customerId);
 
-      conditions.push(sql`${customers.id} NOT IN (SELECT customer_id FROM (${activeCustomerIdsSubquery}) as active_cust)`);
+      conditions.push(
+        sql`${customers.id} NOT IN (SELECT customer_id FROM (${activeCustomerIdsSubquery}) as active_cust)`,
+      );
     }
   }
 
@@ -59,7 +71,9 @@ export async function getPaginatedClientsList({
 
   // Base query for counting total matching customers
   const [countResult] = await db
-    .select({ count: sql<number>`count(distinct ${customers.id})`.mapWith(Number) })
+    .select({
+      count: sql<number>`count(distinct ${customers.id})`.mapWith(Number),
+    })
     .from(customers)
     .leftJoin(orders, eq(customers.id, orders.customerId))
     .where(whereClause);
@@ -89,12 +103,7 @@ export async function getPaginatedClientsList({
     .leftJoin(orders, eq(customers.id, orders.customerId))
     .leftJoin(orderItems, eq(orders.id, orderItems.orderId))
     .where(whereClause)
-    .groupBy(
-      customers.id,
-      customers.name,
-      customers.email,
-      customers.createdAt,
-    )
+    .groupBy(customers.id, customers.name, customers.email, customers.createdAt)
     .orderBy(orderByClause)
     .limit(limit)
     .offset(offset);
